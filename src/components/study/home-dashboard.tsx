@@ -39,7 +39,7 @@ function Panel({
   children: React.ReactNode
 }) {
   return (
-    <section className="min-w-0 overflow-hidden rounded-xl border border-white/10 bg-[#1b1d20]">
+    <section aria-label={title} className="min-w-0 overflow-hidden rounded-xl border border-white/10 bg-[#1b1d20]">
       <div className="flex items-center justify-between gap-4 border-b border-white/10 px-5 py-4">
         <h2 className="text-sm font-semibold text-white">{title}</h2>
         <Link
@@ -81,6 +81,9 @@ function TaskList({ tasks }: { tasks: DashboardTask[] }) {
             <p className="mt-1 text-xs text-[#9ca0a7]">
               {task.subject} · {task.status}
             </p>
+            {task.progress && (
+              <p className="mt-1 text-xs text-[#ddb588]">{task.progress}</p>
+            )
           </div>
           <span className="shrink-0 text-xs text-[#ddb588]">
             {task.due ? dateLabel(task.due) : "Без срока"}

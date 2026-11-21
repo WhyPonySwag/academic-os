@@ -92,31 +92,31 @@
 
 .dark {
   color-scheme: dark;
-  --background: #121416;
-  --foreground: #f0efeb;
-  --card: #1b1d20;
+  --background: #101215;
+  --foreground: #f2f0ec;
+  --card: #1b1e21;
   --card-foreground: var(--foreground);
   --popover: var(--card);
   --popover-foreground: var(--foreground);
-  --primary: #e6ba87;
+  --primary: #deb88b;
   --primary-foreground: #282118;
-  --secondary: #27292d;
+  --secondary: #282b2f;
   --secondary-foreground: var(--foreground);
   --muted: var(--secondary);
-  --muted-foreground: #a2a4a8;
-  --accent: #2d2e30;
+  --muted-foreground: #a1a5aa;
+  --accent: #302b26;
   --accent-foreground: var(--foreground);
   --destructive: #ed928c;
-  --border: #333538;
+  --border: #323538;
   --input: var(--border);
   --ring: var(--primary);
-  --sidebar: #17191b;
+  --sidebar: #16191c;
   --sidebar-foreground: #c7c8ca;
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--primary-foreground);
   --sidebar-accent: #322d27;
   --sidebar-accent-foreground: var(--primary);
-  --sidebar-border: #2b2d30;
+  --sidebar-border: #2a2d30;
   --sidebar-ring: var(--ring);
 }
 
@@ -156,4 +156,156 @@
   html {
     @apply font-sans;
   }
+}
+/* Architecture studio visual system — decorative only, no data is inferred. */
+@layer base {
+  html { text-rendering: optimizeLegibility; }
+  body {
+    background-color: var(--background);
+    background-image: radial-gradient(ellipse at 55% -26%, #38312642 0%, transparent 51%);
+    min-height: 100vh;
+  }
+  ::selection { background: #deb88b53; color: #fff7eb; }
+  :where(a, button, input, select, textarea, summary):focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+  }
+}
+
+.studio-main { position: relative; isolation: isolate; }
+.studio-main::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(to bottom, #ffffff02, transparent 42rem);
+}
+
+.studio-sidebar-brand { letter-spacing: -.01em; }
+.studio-sidebar-logo {
+  box-shadow: 0 0 0 1px #f4cf9b2e, 0 10px 26px #00000032;
+}
+.studio-sidebar-footer { margin-top: auto; }
+
+.studio-dashboard { max-width: 1320px; }
+.studio-dashboard .dashboard-hero {
+  overflow: hidden;
+  position: relative;
+  background:
+    radial-gradient(circle at 86% -30%, #deb88b29 0, transparent 47%),
+    linear-gradient(120deg, #262421 0%, #1a1e21 60%, #1b1d1f 100%);
+  border: 1px solid #574a3b76;
+  box-shadow: 0 24px 74px #0000001f, inset 0 1px 0 #ffffff0a;
+}
+.studio-dashboard .dashboard-hero::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  width: 19rem;
+  height: 19rem;
+  right: -5rem;
+  top: -7rem;
+  opacity: .2;
+  border: 1px solid #d9b58b;
+  border-radius: 50%;
+  box-shadow: 0 0 0 45px #d9b58b0a, 0 0 0 46px #d9b58b63, 0 0 0 91px #d9b58b09, 0 0 0 92px #d9b58b42;
+}
+.studio-dashboard .dashboard-stat {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  min-height: 156px;
+  border: 1px solid #ffffff11;
+  background: linear-gradient(155deg, #222427 0%, #191c20 100%);
+  border-radius: 16px;
+  padding: 19px;
+  transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+.studio-dashboard .dashboard-stat:hover,
+.studio-dashboard .dashboard-stat:focus-visible {
+  border-color: #deb88b7a;
+  background: linear-gradient(150deg, #292827 0%, #1c1f22 100%);
+  transform: translateY(-2px);
+}
+.studio-dashboard .dashboard-panel {
+  min-width: 0;
+  overflow: hidden;
+  background: linear-gradient(160deg, #1e2125 0%, #191c20 100%);
+  border: 1px solid #ffffff12;
+  box-shadow: inset 0 1px 0 #ffffff06;
+  border-radius: 16px;
+  transition: border-color .2s ease;
+}
+.studio-dashboard .dashboard-panel:hover { border-color: #ffffff25; }
+.studio-dashboard .dashboard-panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 19px 22px;
+  border-bottom: 1px solid #ffffff0d;
+}
+.studio-dashboard .dashboard-panel-heading h2 {
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: -.015em;
+}
+.studio-dashboard .dashboard-panel-content { padding: 20px 22px 22px; }
+.studio-dashboard .dashboard-item {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  transition: background .15s ease, border-color .15s ease;
+}
+.studio-dashboard .dashboard-item:hover,
+.studio-dashboard .dashboard-item:focus-visible {
+  background: #ffffff08;
+  border-color: #ffffff11;
+}
+.studio-dashboard .dashboard-muted { color: #a5a7aa; }
+.studio-dashboard .dashboard-chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #deb88b2b;
+  border-radius: 999px;
+  background: #deb88b13;
+  color: #e4c39a;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.studio-dashboard .dashboard-divider { border-color: #ffffff12; }
+.studio-dashboard .dashboard-subject {
+  display: flex;
+  border: 1px solid #ffffff0e;
+  background: #ffffff04;
+  border-radius: 12px;
+  transition: border-color .15s ease, background .15s ease;
+}
+.studio-dashboard .dashboard-subject:hover { border-color: #deb88b59; background: #deb88b0a; }
+.studio-dashboard .dashboard-refresh {
+  border: 1px solid #ffffff22;
+  background: #ffffff09;
+  transition: border-color .15s ease, background .15s ease;
+}
+.studio-dashboard .dashboard-refresh:hover { border-color: #deb88b82; background: #ffffff14; }
+
+[data-slot="card"] {
+  box-shadow: inset 0 1px 0 #ffffff05;
+  transition: box-shadow .18s ease, background .18s ease;
+}
+[data-slot="card"]:hover { box-shadow: inset 0 1px 0 #ffffff0d, 0 12px 35px #00000016; }
+
+@media (max-width: 639px) {
+  .studio-dashboard .dashboard-hero::after { opacity: .08; right: -12rem; }
+  .studio-dashboard .dashboard-stat { min-height: 134px; padding: 15px; }
+  .studio-dashboard .dashboard-panel-heading { padding: 16px 17px; }
+  .studio-dashboard .dashboard-panel-content { padding: 17px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .studio-dashboard .dashboard-stat,
+  .studio-dashboard .dashboard-panel,
+  .studio-dashboard .dashboard-item,
+  .studio-dashboard .dashboard-subject { transition: none; transform: none; }
 }

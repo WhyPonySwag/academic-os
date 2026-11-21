@@ -1,0 +1,37 @@
+# ACADEMIC OS — generated and private files
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+.turbo/
+*.log
+
+# Local databases and journal files
+data/
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+
+# Credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+
+# Personal materials and automation output
+_incoming/
+_backups/
+_reports/
+_exports/
+_tools/
+uploads/
+private/
+.DS_Store
+Thumbs.db

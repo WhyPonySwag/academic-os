@@ -275,7 +275,8 @@ export async function readDashboard(): Promise<DashboardData> {
   lessons.sort((a, b) => a.start.localeCompare(b.start))
 
   const taskColumns = columns("tasks")
-  const debtFlag = ["isDebt", "isAcademicDebt", "is_debt"]
+  // The current SQLite migration stores confirmed debts in tasks.debt.
+  const debtFlag = ["debt", "isDebt", "isAcademicDebt", "is_debt"]
     .find(field => taskColumns.has(field))
 
   const debtTable = ["academic_debts", "task_debts", "debts"]

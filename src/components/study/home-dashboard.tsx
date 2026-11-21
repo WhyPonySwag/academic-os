@@ -83,7 +83,7 @@ function TaskList({ tasks }: { tasks: DashboardTask[] }) {
             </p>
             {task.progress && (
               <p className="mt-1 text-xs text-[#ddb588]">{task.progress}</p>
-            )
+            )}
           </div>
           <span className="shrink-0 text-xs text-[#ddb588]">
             {task.due ? dateLabel(task.due) : "Без срока"}

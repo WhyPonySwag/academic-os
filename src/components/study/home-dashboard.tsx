@@ -73,7 +73,7 @@ function TaskList({ tasks }: { tasks: DashboardTask[] }) {
       {tasks.map(task => (
         <Link
           key={task.id}
-          href="/tasks"
+          href={`/tasks?task=${task.id}`}
           className="flex items-start justify-between gap-3 rounded-lg p-2 hover:bg-white/5"
         >
           <div className="min-w-0">

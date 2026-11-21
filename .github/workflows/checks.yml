@@ -1,0 +1,88 @@
+name: ACADEMIC OS checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  public-file-check:
+    name: Check public repository file paths
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reject sensitive file paths
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import re
+          import subprocess
+          import sys
+
+          paths = subprocess.check_output(
+              ["git", "ls-files", "-z"]
+          ).decode("utf-8", errors="replace").split("\0")
+
+          forbidden = re.compile(
+              r"(^|/)(data|_incoming|_backups|_reports|_exports|uploads|private)/"
+              r"|(^|/)\.env(?:\.|$)"
+              r"|\.(?:db|sqlite|sqlite3|pem|p12|pfx|jks)$"
+              r"|\.db-(?:wal|shm)$",
+              re.IGNORECASE
+          )
+          violations = [path for path in paths if path and forbidden.search(path)]
+          if violations:
+              print("Files that must not be published:")
+              for path in violations:
+                  print(f"  - {path}")
+              sys.exit(1)
+          print("Tracked file path check passed.")
+          PY
+
+  quality:
+    name: TypeScript, ESLint, Playwright, Build
+    runs-on: ubuntu-latest
+    needs: public-file-check
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check whether app sources have been uploaded
+        id: sources
+        run: |
+          if [ -f package.json ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "No package.json yet; application checks are deferred."
+          fi
+      - name: Set up Node.js
+        if: steps.sources.outputs.exists == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        if: steps.sources.outputs.exists == 'true'
+        run: npm ci
+      - name: TypeScript
+        if: steps.sources.outputs.exists == 'true'
+        run: npm exec -- tsc --noEmit
+      - name: ESLint
+        if: steps.sources.outputs.exists == 'true'
+        run: npm exec -- eslint .
+      - name: Install Playwright Chromium
+        if: steps.sources.outputs.exists == 'true'
+        run: npm exec -- playwright install --with-deps chromium
+      - name: Playwright
+        if: steps.sources.outputs.exists == 'true'
+        run: npm exec -- playwright test
+      - name: Production build
+        if: steps.sources.outputs.exists == 'true'
+        run: npm run build

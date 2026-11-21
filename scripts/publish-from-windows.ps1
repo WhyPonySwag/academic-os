@@ -118,7 +118,7 @@ foreach ($entry in $included) {
     }
 }
 
-& git.exe -C $clone add -- src public tests docs AGENTS.md components.json package.json package-lock.json tsconfig.json next.config.ts next.config.mjs eslint.config.mjs eslint.config.js playwright.config.ts postcss.config.mjs postcss.config.js tailwind.config.ts tailwind.config.js
+& git.exe -C $clone add -A
 if ($LASTEXITCODE -ne 0) { throw "Staging failed. Nothing was pushed." }
 
 $status = & git.exe -C $clone diff --cached --name-only

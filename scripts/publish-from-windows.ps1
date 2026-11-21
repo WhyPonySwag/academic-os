@@ -26,9 +26,9 @@ $clone = Join-Path $stage "repository"
 New-Item -ItemType Directory -Force -Path $stage | Out-Null
 
 # Only these root entries may be published.
-$rootDirectories = @("src", "public", "tests", "docs")
+$rootDirectories = @("src", "public", "tests")
 $rootFiles = @(
-    "AGENTS.md", "components.json", "package.json", "package-lock.json",
+    "components.json", "package.json", "package-lock.json",
     "tsconfig.json", "next.config.ts", "next.config.mjs",
     "eslint.config.mjs", "eslint.config.js",
     "playwright.config.ts", "postcss.config.mjs", "postcss.config.js",

@@ -12,6 +12,7 @@ export type DashboardTask = {
   status: string
   priority: string
   complete: boolean
+  progress: string | null
 }
 
 export type DashboardLesson = {
@@ -164,6 +165,14 @@ export async function readDashboard(): Promise<DashboardData> {
   const subjects = read("subjects")
   const taskRows = read("tasks")
   const lessonRows = read("lessons")
+
+  const stepTotals = new Map<number, { total: number; done: number }>()
+  if (available.has("task_steps")) {
+    for (const step of db.prepare(`SELECT taskId, COUNT(*) AS total, SUM(done) AS done
+      FROM task_steps GROUP BY taskId`).all()) {
+      stepTotals.set(num(step.taskId), { total: num(step.total), done: num(step.done) })
+    }
+  }
   const subjectMap = new Map<number, string>()
 
   for (const row of subjects) {
@@ -178,6 +187,7 @@ export async function readDashboard(): Promise<DashboardData> {
       const subjectId = num(get(row, ["subjectId", "subject_id"]))
       const status = str(row.status, "Не выяснено")
 
+      const steps = stepTotals.get(num(row.id))
       return {
         id: num(row.id),
         title: str(get(row, ["title", "name"]), "Без названия"),
@@ -189,6 +199,7 @@ export async function readDashboard(): Promise<DashboardData> {
         status,
         priority: str(row.priority),
         complete: complete(status),
+        progress: steps ? `${steps.done} из ${steps.total}` : null,
       }
     })
 
@@ -275,7 +286,8 @@ export async function readDashboard(): Promise<DashboardData> {
   lessons.sort((a, b) => a.start.localeCompare(b.start))
 
   const taskColumns = columns("tasks")
-  const debtFlag = ["isDebt", "isAcademicDebt", "is_debt"]
+  // The current SQLite migration stores confirmed debts in tasks.debt.
+  const debtFlag = ["debt", "isDebt", "isAcademicDebt", "is_debt"]
     .find(field => taskColumns.has(field))
 
   const debtTable = ["academic_debts", "task_debts", "debts"]

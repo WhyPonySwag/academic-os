@@ -71,6 +71,9 @@ jobs:
       - name: Install dependencies
         if: steps.sources.outputs.exists == 'true'
         run: npm ci
+      - name: Production build (also generates Next.js route types)
+        if: steps.sources.outputs.exists == 'true'
+        run: npm run build
       - name: TypeScript
         if: steps.sources.outputs.exists == 'true'
         run: npm exec -- tsc --noEmit
@@ -80,9 +83,8 @@ jobs:
       - name: Install Playwright Chromium
         if: steps.sources.outputs.exists == 'true'
         run: npm exec -- playwright install --with-deps chromium
-      - name: Playwright
+      - name: Playwright (isolated SQLite)
         if: steps.sources.outputs.exists == 'true'
+        env:
+          ACADEMIC_E2E_SKIP_BUILD: '1'
         run: npm exec -- playwright test
-      - name: Production build
-        if: steps.sources.outputs.exists == 'true'
-        run: npm run build

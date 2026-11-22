@@ -1,4 +1,4 @@
-﻿import "server-only"
+import "server-only"
 
 import { localDatabase } from "@/lib/academic/database"
 
@@ -11,8 +11,9 @@ export type DashboardTask = {
   due: string | null
   status: string
   priority: string
+  steps: number
+  done: number
   complete: boolean
-  progress: string | null
 }
 
 export type DashboardLesson = {
@@ -165,14 +166,6 @@ export async function readDashboard(): Promise<DashboardData> {
   const subjects = read("subjects")
   const taskRows = read("tasks")
   const lessonRows = read("lessons")
-
-  const stepTotals = new Map<number, { total: number; done: number }>()
-  if (available.has("task_steps")) {
-    for (const step of db.prepare(`SELECT taskId, COUNT(*) AS total, SUM(done) AS done
-      FROM task_steps GROUP BY taskId`).all()) {
-      stepTotals.set(num(step.taskId), { total: num(step.total), done: num(step.done) })
-    }
-  }
   const subjectMap = new Map<number, string>()
 
   for (const row of subjects) {
@@ -182,12 +175,18 @@ export async function readDashboard(): Promise<DashboardData> {
     )
   }
 
+  const progress = new Map<number, { steps: number; done: number }>()
+  if (available.has("task_steps")) {
+    for (const row of db.prepare("SELECT taskId, count(*) steps, sum(done) done FROM task_steps GROUP BY taskId").all()) {
+      progress.set(Number(row.taskId), { steps: Number(row.steps), done: Number(row.done) })
+    }
+  }
+
   const tasks: (DashboardTask & { subjectId: number })[] =
     taskRows.map(row => {
       const subjectId = num(get(row, ["subjectId", "subject_id"]))
       const status = str(row.status, "Не выяснено")
 
-      const steps = stepTotals.get(num(row.id))
       return {
         id: num(row.id),
         title: str(get(row, ["title", "name"]), "Без названия"),
@@ -198,8 +197,8 @@ export async function readDashboard(): Promise<DashboardData> {
         ),
         status,
         priority: str(row.priority),
+        ...(progress.get(num(row.id)) ?? { steps: 0, done: 0 }),
         complete: complete(status),
-        progress: steps ? `${steps.done} из ${steps.total}` : null,
       }
     })
 
@@ -286,7 +285,6 @@ export async function readDashboard(): Promise<DashboardData> {
   lessons.sort((a, b) => a.start.localeCompare(b.start))
 
   const taskColumns = columns("tasks")
-  // The current SQLite migration stores confirmed debts in tasks.debt.
   const debtFlag = ["debt", "isDebt", "isAcademicDebt", "is_debt"]
     .find(field => taskColumns.has(field))
 

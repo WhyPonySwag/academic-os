@@ -33,8 +33,8 @@ export function Subjects({ subjects, scoped }: { subjects: SubjectSummary[]; sco
       <div className="grid gap-4 xl:grid-cols-2">
         {visible.map(subject => (
           <Card key={subject.id} className="min-w-0">
-            <CardContent className="flex h-full flex-col gap-3">
-              <div className="text-xs text-muted-foreground">Семестр {subject.semester}</div>
+            <CardContent className="flex h-full flex-col gap-2.5">
+              <div className="w-fit rounded-md border bg-secondary px-2 py-1 text-xs tabular-nums text-muted-foreground">Семестр {subject.semester}</div>
               <h2 className="text-lg font-semibold wrap-anywhere">{subject.title}</h2>
               <p className="text-sm text-muted-foreground">Заданий: {subject.total} · Незавершённых: {subject.unfinished} · Долгов: {subject.debts}</p>
               <p className="text-xs text-muted-foreground">Ближайший срок: {subject.nearest?.split("-").reverse().join(".") ?? "Нет предстоящих сроков"}</p>

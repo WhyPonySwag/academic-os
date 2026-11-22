@@ -44,16 +44,16 @@ async function Month({ searchParams }: PageProps<"/calendar">) {
           {Array.from({length:blank},(_,i) => <div key={i} className="bg-background" />)}
           {cells.map((c,i) => <Link key={c.date} scroll={false} href={url(c.date)} aria-current={c.date === today ? "date" : undefined}
             aria-label={`${displayDate(c.date)}. Занятий: ${c.lessons.length}. Заданий: ${c.tasks.length}`}
-            className={`min-h-16 min-w-0 p-1 hover:bg-muted sm:min-h-20 sm:p-2 ${c.date === selected ? "bg-muted ring-1 ring-primary ring-inset" : "bg-card"}`}>
-            <span className={`inline-grid size-6 place-items-center rounded-full text-xs font-medium ${c.date === today ? "bg-primary text-primary-foreground" : ""}`}>{i+1}</span>
+            className={`min-h-16 min-w-0 p-1 hover:bg-muted sm:min-h-20 sm:p-2 ${c.date === selected ? "bg-accent ring-1 ring-primary ring-inset" : "bg-card"}`}>
+            <span className={`inline-grid size-6 place-items-center rounded-full text-xs font-medium ${c.date === today ? "border border-primary bg-accent font-bold text-foreground" : ""}`}>{i+1}</span>
             <span className="mt-1 flex flex-wrap gap-1 text-[10px]">
               {!!c.lessons.length && <span className="inline-flex items-center gap-0.5 text-primary"><BookOpen size={12}/>{c.lessons.length}</span>}
-              {!!c.tasks.length && <span className="inline-flex items-center gap-0.5 text-[#b0b6db]"><Flag size={12}/>{c.tasks.length}</span>}
+              {!!c.tasks.length && <span className="inline-flex items-center gap-0.5 text-muted-foreground"><Flag size={12}/>{c.tasks.length}</span>}
             </span>
           </Link>)}
           {Array.from({length:(7-(blank+days)%7)%7},(_,i) => <div key={"end"+i} className="bg-background" />)}
         </div>
-        <p className="flex items-center gap-2 text-xs text-muted-foreground"><BookOpen size={14} className="text-primary"/>Занятия <Flag size={14} className="ml-2 text-[#b0b6db]"/>Дедлайны</p>
+        <p className="flex items-center gap-2 text-xs text-muted-foreground"><BookOpen size={14} className="text-primary"/>Занятия <Flag size={14} className="ml-2 text-muted-foreground"/>Дедлайны</p>
       </Card>
       <Card className="min-w-0 gap-3 px-4">
         <h2 className="text-lg font-semibold first-letter:uppercase">{format(selected,{weekday:"long",day:"numeric",month:"long"})}</h2>
@@ -68,7 +68,7 @@ async function Month({ searchParams }: PageProps<"/calendar">) {
           </div>
         </details>)}
         {day.tasks.map(t => <details key={"task"+t.id} className="border-t pt-3 text-sm">
-          <summary className="cursor-pointer wrap-anywhere"><Flag className="mx-1 inline size-4 text-[#b0b6db]"/> {t.title}</summary>
+          <summary className="cursor-pointer wrap-anywhere"><Flag className="mx-1 inline size-4 text-muted-foreground"/> {t.title}</summary>
           <div className="mt-3 space-y-2 wrap-anywhere"><p>{t.subject}</p><p>Дедлайн: {displayDate(t.deadline)}</p><p>Статус: {t.status}</p><p>Приоритет: {t.priority}</p>
             <Link className="text-primary underline" href={`/tasks?task=${t.id}`}>Карточка задания</Link></div>
         </details>)}

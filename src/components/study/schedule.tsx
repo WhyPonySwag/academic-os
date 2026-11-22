@@ -78,7 +78,7 @@ export function Schedule({ week, today, lessons, subjects, groupParam, dayParam 
     {!subjects.length && <p className="text-sm text-muted-foreground">Для первого занятия <Link className="text-primary underline" href="/subjects">добавьте предмет</Link> или загрузите данные из JSON.</p>}
     <nav aria-label="Дни недели" className="grid grid-cols-7 gap-1 rounded-xl border bg-card p-1">
       {dates.map((date,i) => <Link key={date} href={url(week,date)} scroll={false} aria-current={day === date ? "date" : undefined}
-        aria-label={weekdays[i] + " " + displayDate(date)} className={`rounded-lg py-2 text-center text-xs hover:bg-muted ${day === date ? "bg-muted text-primary" : "text-muted-foreground"}`}>
+        aria-label={weekdays[i] + " " + displayDate(date)} className={`rounded-md border border-transparent py-2 text-center text-xs hover:bg-muted ${day === date ? "border-primary/60! bg-secondary font-semibold text-foreground" : "text-muted-foreground"}`}>
         <span className="block">{["Пн","Вт","Ср","Чт","Пт","Сб","Вс"][i]}</span><span className="text-base font-semibold">{Number(date.slice(-2))}</span>
       </Link>)}
     </nav>
@@ -90,8 +90,8 @@ export function Schedule({ week, today, lessons, subjects, groupParam, dayParam 
           className="grid w-full grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-x-3 gap-y-1 px-3 py-2.5 text-left text-sm hover:bg-muted focus-visible:outline-primary sm:grid-cols-[4rem_6.5rem_minmax(0,1fr)_auto]">
           <span className="text-xs text-muted-foreground">Пара {pair}</span>
           <span className="col-start-1 row-start-2 text-xs tabular-nums sm:col-auto sm:row-auto">{start}–{end}</span>
-          <span className="col-start-2 row-start-1 font-medium wrap-anywhere sm:col-auto sm:row-auto">{l.subject} {l.subgroup !== "Вся группа" && <Badge variant="secondary">{l.subgroup}</Badge>}
-            {l.status !== "Запланировано" && <span className="ml-1 text-xs text-primary">{l.status}</span>}</span>
+          <span className="col-start-2 row-start-1 font-medium wrap-anywhere sm:col-auto sm:row-auto"><span className={l.status === "Отменено" ? "text-muted-foreground line-through" : undefined}>{l.subject}</span> {l.subgroup !== "Вся группа" && <Badge variant="secondary">{l.subgroup}</Badge>}
+            {l.status !== "Запланировано" && <span className={l.status === "Перенесено" ? "ml-1 text-xs text-warning" : "ml-1 text-xs text-muted-foreground"}>{l.status}</span>}</span>
           <span className="text-xs wrap-anywhere text-muted-foreground">ауд. {l.room}</span>
         </button>)}
       </Card>

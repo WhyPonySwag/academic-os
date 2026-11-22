@@ -6,8 +6,8 @@ import { Label } from "@/components/ui/label"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import type { ActionResult } from "@/lib/academic/model"
 
-export const selectStyle = "h-9 w-full min-w-0 rounded-lg border bg-card px-2 text-sm focus-visible:outline-primary"
-export const areaStyle = "min-h-20 w-full resize-y rounded-lg border bg-input/30 px-3 py-2 text-sm focus-visible:outline-primary"
+export const selectStyle = "h-9 w-full min-w-0 rounded-lg border border-input bg-card px-2 text-sm focus-visible:outline-primary"
+export const areaStyle = "min-h-20 w-full resize-y rounded-lg border border-input bg-card px-3 py-2 text-sm focus-visible:outline-primary"
 
 export function Field({ label, children }: { label: string; children: ReactElement<{ id?: string }> }) {
   const id = useId()

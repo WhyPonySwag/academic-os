@@ -51,7 +51,7 @@ export function Tasks({ subjects, tasks, initialSubject, initialTask, initialDeb
         <h1 className="page-title">Задания</h1>
         {subjects.length > 0 && <Button onClick={() => setPanel({ mode: "edit" })}><Plus aria-hidden />Добавить задание</Button>}
       </div>
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 rounded-xl border bg-card p-3 sm:grid-cols-2 xl:grid-cols-3">
         <Field label="Список работ"><select className={selectStyle} value={view} onChange={e=>setView(e.target.value)}><option value="">Все работы</option><option value="unfinished">Незавершённые</option><option value="attention">Требуют внимания</option></select></Field>
         <Field label="Поиск заданий"><Input type="search" value={search} onChange={e=>setSearch(e.target.value)}/></Field>
         <Field label="Задолженность"><select className={selectStyle} value={debt} onChange={e=>setDebt(e.target.value)}><option value="">Все работы</option><option value="debt">Подтверждённые долги</option><option value="ordinary">Без задолженности</option></select></Field>
@@ -64,7 +64,7 @@ export function Tasks({ subjects, tasks, initialSubject, initialTask, initialDeb
         {!subjects.length && <><p className="text-sm text-muted-foreground">Для первого задания добавьте предмет.</p><Link href="/subjects" className={buttonVariants({ variant: "outline" })}>К предметам</Link></>}
       </Card>}
       {visible.length > 0 && <Card className="gap-0 py-0">
-        {visible.map(task => <CardContent key={task.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b py-4 last:border-0">
+        {visible.map(task => <CardContent key={task.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b py-3 last:border-0 hover:bg-secondary/60">
           <div className="min-w-0 grow basis-48">
             <button className="text-left font-semibold wrap-anywhere hover:text-primary" onClick={() => setPanel({ mode: "view", task })}>{task.title}</button>
             <p className="mt-1 text-xs wrap-anywhere text-muted-foreground">{subjectNames.get(task.subjectId)}</p>
@@ -73,7 +73,7 @@ export function Tasks({ subjects, tasks, initialSubject, initialTask, initialDeb
           <span className="text-xs text-muted-foreground">{progress(task.steps)}</span>
           {debt === "debt" && <span className="basis-full text-sm wrap-anywhere">Далее: {task.steps.find(s=>!s.done)?.title || task.description || "Действия не указаны"}</span>}
           <Badge variant="secondary">{task.status}</Badge>
-          <span className="text-xs text-muted-foreground">{task.priority}</span>
+          <span className={task.priority === "Срочный" ? "text-xs font-semibold text-warning" : task.priority === "Высокий" ? "text-xs font-semibold text-foreground" : "text-xs text-muted-foreground"}>{task.priority}</span>
           <span className="flex items-center gap-1.5 text-xs tabular-nums"><CalendarDays aria-hidden className="size-3.5" />{task.deadline ? displayDate(task.deadline) : "Без срока"}</span>
         </CardContent>)}
       </Card>}

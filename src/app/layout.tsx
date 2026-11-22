@@ -7,7 +7,7 @@ import "./globals.css"
 export const metadata: Metadata = {
   title: { default: "Главная · ACADEMIC OS", template: "%s · ACADEMIC OS" },
   description: "Персональное учебное пространство студента архитектуры.",
-  icons: { icon: "/compass.png" },
+  icons: { icon: "/compass-mark.svg" },
 }
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -19,7 +19,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <AppSidebar />
           <SidebarInset className="min-w-0">
             <SiteHeader />
-            <div id="page-content" tabIndex={-1} className="mx-auto w-full max-w-[1360px] px-4 py-7 outline-none sm:px-8 lg:px-10 lg:py-9">
+            <div id="page-content" tabIndex={-1} className="mx-auto w-full max-w-[1480px] px-4 py-7 outline-none sm:px-8 lg:px-10 lg:py-9">
               {children}
             </div>
           </SidebarInset>

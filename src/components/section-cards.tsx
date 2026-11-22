@@ -6,22 +6,22 @@ import { academicOverview } from "@/lib/academic/queries"
 import { displayDate } from "@/lib/academic/model"
 
 const overview = [
-  { section: "schedule", title: "Занятия сегодня", message: "На сегодня занятий нет", detail: "Время и аудитории появятся в расписании.", color: "bg-[#322b21] text-[#e1b67e]" },
-  { section: "tasks", title: "Ближайшие задания", message: "Ближайших сроков нет", detail: "Здесь появятся непринятые работы с известной датой сдачи.", color: "bg-[#292b38] text-[#b0b6db]" },
-  { section: "calendar", title: "Предстоящие события", message: "Событий пока нет", detail: "Здесь появятся ближайшие даты из календаря.", color: "bg-[#242f2c] text-[#9dbfb0]" },
-  { section: "subjects", title: "Учебные дисциплины", message: "", detail: "Перейти к списку предметов", color: "bg-[#312934] text-[#c6a8ca]" },
+  { section: "schedule", title: "Занятия сегодня", message: "На сегодня занятий нет", detail: "Время и аудитории появятся в расписании." },
+  { section: "tasks", title: "Ближайшие задания", message: "Ближайших сроков нет", detail: "Здесь появятся непринятые работы с известной датой сдачи." },
+  { section: "calendar", title: "Предстоящие события", message: "Событий пока нет", detail: "Здесь появятся ближайшие даты из календаря." },
+  { section: "subjects", title: "Учебные дисциплины", message: "", detail: "Перейти к списку предметов" },
 ] as const
 
 export async function SectionCards() {
   const { count, upcoming, todayLessons, works, disciplines } = await academicOverview()
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      {overview.filter(c=>c.section!=="calendar").map(({ section, title, message, detail, color }) => {
+      {overview.filter(c=>c.section!=="calendar").map(({ section, title, message, detail }) => {
         const { href, icon: Icon } = sections[section]
         return (
           <Card key={section} className="relative gap-0 p-0 transition-colors hover:ring-foreground/25">
             <CardHeader className="flex items-center gap-3 px-5 py-4 sm:px-6">
-              <span className={`grid size-9 shrink-0 place-items-center rounded-lg ${color}`}>
+              <span className="grid size-9 shrink-0 place-items-center rounded-lg border bg-secondary text-primary">
                 <Icon aria-hidden className="size-[19px]" strokeWidth={1.65} />
               </span>
               <h2 className="text-base font-semibold tracking-tight">

@@ -12,7 +12,7 @@ export function AppSidebar() {
     <Sidebar collapsible="offcanvas">
       <SidebarHeader className="px-5 py-6">
         <Link href="/" onClick={() => setOpenMobile(false)} className="flex w-fit items-center gap-3 rounded-md">
-          <span className="grid size-10 place-items-center rounded-lg bg-primary text-primary-foreground">
+          <span className="grid size-10 place-items-center rounded-lg border border-border bg-secondary text-primary">
             <DraftingCompass aria-hidden className="size-6" />
           </span>
           <span className="flex flex-col gap-0.5">

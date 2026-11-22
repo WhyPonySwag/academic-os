@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -9,13 +9,14 @@ import {
   BookOpen,
   CalendarDays,
   CheckCircle2,
-  Clock3,
   GraduationCap,
   ListTodo,
   Megaphone,
   RefreshCw,
 } from "lucide-react"
 
+import { LocalClock } from "@/components/local-clock"
+import { Button } from "@/components/ui/button"
 import type {
   DashboardData,
   DashboardTask,
@@ -39,25 +40,25 @@ function Panel({
   children: React.ReactNode
 }) {
   return (
-    <section aria-label={title} className="min-w-0 overflow-hidden rounded-xl border border-white/10 bg-[#1b1d20]">
-      <div className="flex items-center justify-between gap-4 border-b border-white/10 px-5 py-4">
-        <h2 className="text-sm font-semibold text-white">{title}</h2>
+    <section aria-label={title} data-slot="card" className="min-w-0 overflow-hidden rounded-xl border border-border bg-card">
+      <div className="flex items-center justify-between gap-4 border-b border-border px-4 py-3">
+        <h2 className="text-base font-semibold tracking-tight text-foreground">{title}</h2>
         <Link
           href={href}
           aria-label={`Открыть раздел: ${title}`}
-          className="text-[#ddb588] hover:text-white"
+          className="grid size-8 shrink-0 place-items-center rounded-md text-primary hover:bg-accent hover:text-foreground"
         >
           <ArrowUpRight size={17} />
         </Link>
       </div>
-      <div className="p-5">{children}</div>
+      <div className="p-4">{children}</div>
     </section>
   )
 }
 
 function Empty({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-sm leading-relaxed text-[#a2a4aa]">
+    <p className="text-sm leading-relaxed text-muted-foreground">
       {children}
     </p>
   )
@@ -74,18 +75,17 @@ function TaskList({ tasks }: { tasks: DashboardTask[] }) {
         <Link
           key={task.id}
           href={`/tasks?task=${task.id}`}
-          className="flex items-start justify-between gap-3 rounded-lg p-2 hover:bg-white/5"
+          aria-label={task.title}
+          className="flex items-start justify-between gap-3 rounded-lg p-2 hover:bg-accent"
         >
           <div className="min-w-0">
-            <p className="text-sm font-medium text-white">{task.title}</p>
-            <p className="mt-1 text-xs text-[#9ca0a7]">
-              {task.subject} · {task.status}
+            <p className="text-sm font-medium wrap-anywhere text-foreground">{task.title}</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {task.subject} · {task.status} · {task.priority}
+              {task.steps > 0 && <span className="ml-2 tabular-nums">{task.done} из {task.steps}</span>}
             </p>
-            {task.progress && (
-              <p className="mt-1 text-xs text-[#ddb588]">{task.progress}</p>
-            )}
           </div>
-          <span className="shrink-0 text-xs text-[#ddb588]">
+          <span className="shrink-0 text-xs text-primary">
             {task.due ? dateLabel(task.due) : "Без срока"}
           </span>
         </Link>
@@ -124,7 +124,7 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
     {
       name: "Незавершённые работы",
       value: data.tasks.open,
-      href: "/tasks",
+      href: "/tasks?view=unfinished",
       icon: ListTodo,
     },
     {
@@ -138,40 +138,39 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
       value: data.debts.supported
         ? data.debts.tasks.length
         : "—",
-      href: "/tasks",
+      href: "/tasks?debt=1",
       icon: GraduationCap,
     },
   ]
 
   return (
-    <div className="mx-auto w-full max-w-[1250px] space-y-6 px-4 py-8 sm:px-8 lg:py-10">
-      <header className="flex flex-wrap items-center justify-between gap-4">
+    <div className="w-full min-w-0 space-y-4">
+      <header className="dashboard-header flex flex-wrap items-center justify-between gap-4 rounded-xl border px-5 py-6 sm:px-7">
         <div>
-          <p className="mb-2 text-xs font-medium tracking-wider text-[#ddb588]">
-            ACADEMIC OS / WORKSPACE
-          </p>
-          <h1 className="text-3xl font-semibold tracking-tight text-white">
+          <h1 className="page-title">
             Учебный обзор
           </h1>
-          <p className="mt-2 text-sm text-[#a2a4aa]">
-            {new Intl.DateTimeFormat("ru-RU", {
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+            <time dateTime={data.today}>{new Intl.DateTimeFormat("ru-RU", {
               weekday: "long",
               day: "numeric",
               month: "long",
               year: "numeric",
               timeZone: "UTC",
-            }).format(new Date(`${data.today}T12:00:00Z`))}
-          </p>
+            }).format(new Date(`${data.today}T12:00:00Z`))}</time>
+            <LocalClock />
+          </div>
         </div>
 
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           onClick={() => router.refresh()}
-          className="flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs text-white hover:bg-white/5"
         >
           <RefreshCw size={14} />
           Обновить данные
-        </button>
+        </Button>
       </header>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -182,16 +181,16 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
             <Link
               key={item.name}
               href={item.href}
-              className="rounded-xl border border-white/10 bg-[#1b1d20] p-4 hover:border-[#ddb588]/50"
+              className="min-w-0 rounded-xl border border-border bg-card p-4 transition-colors duration-150 hover:border-primary/50 hover:bg-secondary"
             >
               <div className="mb-4 flex items-center justify-between">
-                <Icon size={18} className="text-[#ddb588]" />
-                <ArrowUpRight size={14} className="text-[#8a8d94]" />
+                <Icon size={18} className="text-primary" />
+                <ArrowUpRight size={14} className="text-muted-foreground" />
               </div>
-              <p className="text-3xl font-semibold text-white">
+              <p className="text-3xl font-medium tracking-tight text-foreground tabular-nums">
                 {item.value}
               </p>
-              <p className="mt-2 text-xs text-[#a2a4aa]">
+              <p className="mt-2 text-xs text-muted-foreground">
                 {item.name}
               </p>
             </Link>
@@ -199,17 +198,17 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
         })}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
         <Panel title="Занятия сегодня" href="/schedule">
           <div className="mb-4 flex items-center justify-between gap-3">
-            <span className="text-xs text-[#9ca0a7]">
+            <span className="text-xs text-muted-foreground">
               Подгруппа
             </span>
             <select
               aria-label="Фильтр подгруппы"
               value={subgroup}
               onChange={event => setSubgroup(event.target.value)}
-              className="rounded-lg border border-white/10 bg-[#25272a] px-3 py-2 text-xs text-white"
+              className="rounded-lg border border-input bg-secondary px-3 py-2 text-xs text-foreground"
             >
               <option value="Все">Все занятия</option>
               <option value="I">Подгруппа I</option>
@@ -224,32 +223,32 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
               {visibleLessons.map(lesson => (
                 <Link
                   key={`${lesson.id}-${lesson.occurrence}`}
-                  href="/schedule"
-                  className="flex gap-3 rounded-lg border border-white/5 bg-white/[0.025] p-3 hover:bg-white/5"
+                  href={`/schedule?week=${data.today}#lesson-${lesson.id}-${data.today}`}
+                  className="flex gap-3 rounded-lg border border-border bg-secondary/50 p-3 hover:bg-accent"
                 >
-                  <div className="w-20 shrink-0 text-xs font-semibold text-[#ddb588]">
+                  <div className="w-20 shrink-0 text-xs font-semibold text-primary">
                     {lesson.start}
-                    <p className="mt-1 font-normal text-[#a2a4aa]">
+                    <p className="mt-1 font-normal text-muted-foreground">
                       {lesson.end}
                     </p>
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-white">
+                    <p className="text-sm font-medium text-foreground">
                       {lesson.title}
                     </p>
-                    <p className="mt-1 text-xs text-[#a2a4aa]">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       {lesson.room || "Аудитория не указана"}
                       {lesson.subgroup !== "Вся группа"
                         ? ` · ${lesson.subgroup}`
                         : ""}
                     </p>
                     {lesson.teacher && (
-                      <p className="mt-1 text-xs text-[#a2a4aa]">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         {lesson.teacher}
                       </p>
                     )}
                     {lesson.status !== "Запланировано" && (
-                      <p className="mt-1 text-xs text-[#ddb588]">
+                      <p className="mt-1 text-xs text-primary">
                         {lesson.status === "Перенесено" &&
                         lesson.occurrence === "original"
                           ? "Перенесено с этого времени"
@@ -265,8 +264,8 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
 
         <Panel title="Ближайшие дедлайны" href="/tasks">
           <TaskList tasks={data.tasks.upcoming} />
-          <div className="mt-4 border-t border-white/10 pt-3">
-            <Link href="/tasks" className="text-xs text-[#ddb588]">
+          <div className="mt-4 border-t border-border pt-3">
+            <Link href="/tasks" className="text-xs text-primary">
               Показать задания
             </Link>
           </div>
@@ -275,7 +274,7 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
         <Panel title="Просроченные работы" href="/tasks">
           {data.tasks.overdue.length === 0 ? (
             <div className="flex items-center gap-2">
-              <CheckCircle2 size={17} className="text-emerald-400" />
+              <CheckCircle2 size={17} className="text-success" />
               <Empty>Просроченных заданий с известным сроком нет.</Empty>
             </div>
           ) : (
@@ -298,15 +297,15 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
                 <Link
                   key={`${event.id}-${index}`}
                   href="/calendar"
-                  className="flex items-center justify-between gap-3 text-sm hover:text-[#ddb588]"
+                  className="flex items-center justify-between gap-3 text-sm hover:text-primary"
                 >
-                  <span className="min-w-0 text-white">
+                  <span className="min-w-0 text-foreground">
                     {event.title}
-                    <span className="ml-2 text-xs text-[#9ca0a7]">
+                    <span className="ml-2 text-xs text-muted-foreground">
                       {event.type}
                     </span>
                   </span>
-                  <span className="shrink-0 text-xs text-[#ddb588]">
+                  <span className="shrink-0 text-xs text-primary">
                     {dateLabel(event.date)}
                   </span>
                 </Link>
@@ -317,29 +316,29 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
 
         <Panel title="Прогресс недели" href="/tasks">
           <div className="flex items-end justify-between gap-3">
-            <p className="text-sm text-[#a2a4aa]">
+            <p className="text-sm text-muted-foreground">
               Выполнено из заданий со сроком на эту неделю
             </p>
-            <strong className="text-2xl text-white">
+            <strong className="text-2xl text-foreground">
               {percent === null ? "—" : `${percent}%`}
             </strong>
           </div>
 
-          <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#34363b]">
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted">
             <div
-              className="h-full rounded-full bg-[#ddb588]"
+              className="h-full rounded-full bg-primary"
               style={{ width: `${percent ?? 0}%` }}
             />
           </div>
 
-          <p className="mt-3 text-xs text-[#a2a4aa]">
+          <p className="mt-3 text-xs text-muted-foreground">
             {data.weekly.total
               ? `${data.weekly.completed} из ${data.weekly.total} выполнено`
               : "На эту неделю заданий с известным сроком нет."}
           </p>
         </Panel>
 
-        <Panel title="Академические задолженности" href="/tasks">
+        <Panel title="Академические задолженности" href="/tasks?debt=1">
           {!data.debts.supported ? (
             <Empty>
               Учёт подтверждённых задолженностей пока не подключён
@@ -364,11 +363,11 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
               {data.announcements.titles.map((title, index) => (
                 <div
                   key={index}
-                  className="flex items-start gap-2 text-sm text-white"
+                  className="flex items-start gap-2 text-sm text-foreground"
                 >
                   <Megaphone
                     size={16}
-                    className="mt-0.5 shrink-0 text-[#ddb588]"
+                    className="mt-0.5 shrink-0 text-primary"
                   />
                   {title}
                 </div>
@@ -379,23 +378,24 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
       </div>
 
       <Panel title="Обзор дисциплин" href="/subjects">
+        <p className="mb-3 text-xs tabular-nums text-muted-foreground">Предметов: {data.subjects.length}</p>
         <div className="grid gap-2 sm:grid-cols-2">
           {data.subjects.map(subject => (
             <Link
               key={subject.id}
-              href="/subjects"
-              className="flex items-center justify-between gap-3 rounded-lg border border-white/5 p-3 hover:bg-white/5"
+              href={`/subjects?subject=${subject.id}`}
+              className="flex items-center justify-between gap-3 rounded-lg border border-border p-3 hover:bg-accent"
             >
               <div className="flex min-w-0 items-center gap-2">
                 <BookOpen
                   size={16}
-                  className="shrink-0 text-[#ddb588]"
+                  className="shrink-0 text-primary"
                 />
-                <span className="text-sm text-white">
+                <span className="min-w-0 text-sm wrap-anywhere text-foreground">
                   {subject.title}
                 </span>
               </div>
-              <span className="shrink-0 text-xs text-[#a2a4aa]">
+              <span className="shrink-0 text-xs text-muted-foreground" title="Незавершённые / всего">
                 {subject.open} / {subject.total}
               </span>
             </Link>
@@ -407,10 +407,6 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
         )}
       </Panel>
 
-      <p className="flex items-center gap-2 text-xs text-[#868990]">
-        <Clock3 size={14} />
-        Данные загружаются из локальной SQLite. Неизвестные показатели не подменяются нулями.
-      </p>
     </div>
   )
 }

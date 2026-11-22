@@ -13,8 +13,10 @@ export const extrasSchema = z.object({debt:z.boolean(),steps:z.array(step),sourc
 
 export function readWorks(db: DatabaseSync) {
   const works = db.prepare("SELECT * FROM tasks ORDER BY id DESC").all().map(row =>
-    ({...row, steps:[], sources:[], history:[]} as unknown as Work))
+    ({...row, attachments:[], steps:[], sources:[], history:[]} as unknown as Work))
   const byId = new Map(works.map(w=>[w.id,w]))
+  for (const a of db.prepare("SELECT id,title,taskId FROM archive_materials WHERE taskId IS NOT NULL ORDER BY id").all())
+    byId.get(Number(a.taskId))?.attachments.push({id:Number(a.id),title:String(a.title)})
   for (const s of db.prepare("SELECT * FROM task_steps ORDER BY position").all())
     byId.get(Number(s.taskId))!.steps.push({id:String(s.id),title:String(s.title),done:!!s.done})
   for (const s of db.prepare("SELECT * FROM task_sources ORDER BY id").all()) {

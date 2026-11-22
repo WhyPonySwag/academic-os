@@ -41,7 +41,7 @@ export function ImportPanel({ close }: { close: () => void }) {
       <details className="rounded-lg border p-3 text-sm">
         <summary className="cursor-pointer font-medium">Формат файла</summary>
         <div className="mt-3 space-y-2 text-muted-foreground">
-          <p>Объект с полем version равным 1 и массивами subjects, tasks, lessons. Достаточно одного массива. До 500 строк и 256 КиБ на файл.</p>
+          <p>Объект с полем version равным 1 и массивами subjects, tasks, lessons. Достаточно одного массива. Необязательное поле origin хранит название источника. До 500 строк и 256 КиБ на файл.</p>
           <p><b>subjects</b> — title и semester (целое число). Дополнительно teacher, assessment, credits (число), notes.</p>
           <p><b>tasks</b> — title и ссылка на предмет. Дополнительно description, status, priority, deadline, issuedOn, notes. Статусы: {statuses.join(", ")}. Приоритеты: {priorities.join(", ")}.</p>
           <p><b>lessons</b> — ссылка на предмет, teacher, date, pair (целое число), startTime, endTime, room, subgroup («I», «II», «Вся группа»), lessonType. Дополнительно notes и status («Запланировано», «Отменено», «Перенесено»). Для переноса обязательны movedDate, movedPair, movedStart и movedEnd.</p>
@@ -54,6 +54,7 @@ export function ImportPanel({ close }: { close: () => void }) {
       {result && "error" in result && <p role="alert" className="text-sm text-destructive">{result.error}</p>}
       <Button disabled={busy || !source.trim()} variant="outline" onClick={() => void checkOrSave()}>Предварительный просмотр</Button>
       {report && <>
+        {document?.origin && <p className="text-sm">Источник · {document.origin}</p>}
         <h3 className="font-semibold">{report.saved ? "Результат импорта" : "Проверка записей"}</h3>
         <p role="status" className="text-sm">{report.saved ? "Записано" : "Готово к записи"}: {ready}. Отклонено: {report.rows.length - ready}.</p>
         {!report.saved && ready > 0 && <Button disabled={busy} onClick={() => void checkOrSave(report.token)}>Подтвердить запись ({ready})</Button>}

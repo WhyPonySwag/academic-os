@@ -25,7 +25,7 @@ export function NavMain({ items, label, hideLabel }: { items: SectionId[], label
                     isActive={active}
                     aria-current={active ? "page" : undefined}
                     onClick={() => setOpenMobile(false)}
-                    className="h-10 gap-3 rounded-lg px-3 text-sidebar-foreground border border-transparent data-active:border-border data-active:bg-sidebar-accent data-active:font-semibold data-active:text-foreground [&_svg]:size-[17px]"
+                    className="h-8 gap-2 rounded-sm px-3 text-sidebar-foreground border border-transparent data-active:border-l-sky-400 data-active:bg-sidebar-accent data-active:font-semibold data-active:text-foreground [&_svg]:size-[17px]"
                   >
                     <Icon aria-hidden strokeWidth={1.65} />
                     <span>{title}</span>

@@ -50,6 +50,8 @@ export function WorkEditor({ item }: {item?:Work}) {
 export function WorkDetails({task}:{task:Work}) {
   return <div className="grid gap-4 text-sm">
     <section><h3 className="font-semibold">Этапы · {progress(task.steps)}</h3><ol className="list-inside list-decimal">{task.steps.map(s=><li className="wrap-anywhere" key={s.id}>{s.title} · {s.done ? "Выполнен" : "Предстоит"}</li>)}</ol></section>
+    <section><h3 className="font-semibold">Вложения</h3>{task.attachments.map(a=><a className="block underline" key={a.id} href={"/archive/files/"+a.id} download>{a.title}</a>)}
+      <a className="text-xs underline" href={"/archive?task="+task.id}>Прикрепить файл</a></section>
     {task.sources.length>0 && <section><h3 className="font-semibold">Источники</h3>{task.sources.map(s=><p key={s.kind+s.reference} className="wrap-anywhere">{s.category} · {publicLink(s.link) ? <a href={s.link} className="text-primary underline" target="_blank" rel="noreferrer">{s.label}</a> : s.label} · {s.confirmed ? "Подтверждён" : "Без подтверждения"} {s.sourceDate}</p>)}</section>}
     {task.history.length>0 && <details><summary>История изменений</summary><ol>{task.history.map((h,i)=><li key={i} className="mt-1 wrap-anywhere">{new Date(h.at).toLocaleString("ru-RU")} · {h.change}</li>)}</ol></details>}
   </div>

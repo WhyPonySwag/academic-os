@@ -10,7 +10,7 @@ const positive = z.int().positive("Требуется целое положит�
 const time = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Укажите время в формате ЧЧ:ММ.")
 const date = z.iso.date({ error: "Укажите дату в формате ГГГГ-ММ-ДД." }).refine(v => v >= "0002" && v < "9999", "Дата вне диапазона.")
 export const lessonSchema = z.strictObject({
-  subjectId: positive, teacher: required, date, pair: positive, startTime: time, endTime: time, room: required,
+  subjectId: positive, teacher: required, substitute: z.string().trim().max(200).default(""), date, pair: positive, startTime: time, endTime: time, room: required,
   subgroup: z.enum(subgroups), lessonType: required, status: z.enum(lessonStatuses).default("Запланировано"),
   movedDate: date.nullish().transform(v => v ?? null), movedPair: positive.nullish().transform(v => v ?? null),
   movedStart: time.nullish().transform(v => v ?? null), movedEnd: time.nullish().transform(v => v ?? null),
@@ -27,11 +27,11 @@ export const lessonSchema = z.strictObject({
 })
 
 export function lessonValues(l: LessonFields) {
-  return [l.subjectId,l.teacher,l.date,l.pair,l.startTime,l.endTime,l.room,l.subgroup,l.lessonType,l.status,l.movedDate,l.movedPair,l.movedStart,l.movedEnd,l.notes]
+  return [l.subjectId,l.teacher,l.date,l.pair,l.startTime,l.endTime,l.room,l.subgroup,l.lessonType,l.status,l.movedDate,l.movedPair,l.movedStart,l.movedEnd,l.notes,l.substitute ?? ""]
 }
 export function insertLesson(db: DatabaseSync, l: LessonFields) {
   return db.prepare(`INSERT INTO lessons(subjectId,teacher,date,pair,startTime,endTime,room,subgroup,lessonType,status,
-    movedDate,movedPair,movedStart,movedEnd,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(...lessonValues(l))
+    movedDate,movedPair,movedStart,movedEnd,notes,substitute) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(...lessonValues(l))
 }
 
 export function lessonsBetween(db: DatabaseSync, from: string, to: string) {

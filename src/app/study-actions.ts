@@ -28,7 +28,7 @@ async function mutate(change: Change, foreignKeyMessage: string): Promise<Action
 
 const invalidKey = { error: "Некорректный идентификатор записи." }
 const missingSubject = "Предмет уже удалён. Выберите другой предмет."
-const linkedTasks = "У предмета есть задания или занятия. Сначала перенесите или удалите их."
+const linkedTasks = "У предмета есть задания или занятия, результаты или архивные материалы. Сначала проверьте связанные записи."
 
 export async function saveSubject(key: RecordKey | null, form: FormData): Promise<ActionResult> {
   if (key !== null && !keySchema.safeParse(key).success) return invalidKey
@@ -87,5 +87,5 @@ export async function saveTask(key: RecordKey | null, form: FormData): Promise<A
 export async function removeRecord(kind: "subject" | "task", key: RecordKey): Promise<ActionResult> {
   if (!keySchema.safeParse(key).success || (kind !== "subject" && kind !== "task")) return invalidKey
   const sql = kind === "subject" ? "DELETE FROM subjects WHERE id=? AND revision=?" : "DELETE FROM tasks WHERE id=? AND revision=?"
-  return mutate(db => db.prepare(sql).run(key.id, key.revision), linkedTasks)
+  return mutate(db => db.prepare(sql).run(key.id, key.revision), kind === "task" ? "С заданием связаны пересдачи или файлы архива." : linkedTasks)
 }

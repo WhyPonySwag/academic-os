@@ -19,5 +19,6 @@ export async function calendarMonth(requested: unknown) {
   const tasks = db.prepare(`SELECT t.id,t.title,t.subjectId,t.status,t.priority,t.deadline,s.title AS subject
     FROM tasks t JOIN subjects s ON s.id=t.subjectId WHERE t.deadline BETWEEN ? AND ? ORDER BY t.deadline,t.id`)
     .all(first,last).map(row => ({ ...row }) as Deadline)
-  return { today, selected, first, next, previous, days: Number(last.slice(-2)), tasks, lessons: lessonsBetween(db,first,last) }
+  const events = db.prepare("SELECT id,title,kind,day,outcome FROM study_events WHERE day BETWEEN ? AND ? ORDER BY day,id").all(first,last)
+  return { events, today, selected, first, next, previous, days: Number(last.slice(-2)), tasks, lessons: lessonsBetween(db,first,last) }
 }

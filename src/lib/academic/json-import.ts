@@ -22,7 +22,7 @@ const taskSchema = z.strictObject({
 })
 const ref = z.strictObject({ title, semester: positive })
 const rows = z.array(z.unknown()).default([])
-const envelope = z.strictObject({ version: z.literal(1), subjects: rows, tasks: rows, lessons: rows })
+const envelope = z.strictObject({ version: z.literal(1), origin: title.optional(), subjects: rows, tasks: rows, lessons: rows })
 const normalize = (s: string) => s.normalize("NFC").toLocaleLowerCase("ru").trim()
 const subjectKey = (s: { title: string; semester: number }) => JSON.stringify([normalize(s.title), s.semester])
 const taskKey = (id: number, s: string, issued: string | null) => JSON.stringify([id, normalize(s), issued])
@@ -41,7 +41,7 @@ function explain(error: z.ZodError) {
 
 function buildPlan(db: DatabaseSync, data: z.output<typeof envelope>) {
   const report: ImportRow[] = []
-  const inserts: Insert[] = []
+  const inserts: (Insert & {rowNumber:number})[] = []
   const byName = new Map<string, number[]>()
   const names = new Map<number, string>()
   function register(id: number, subject: { title: string; semester: number }) {
@@ -69,7 +69,7 @@ function buildPlan(db: DatabaseSync, data: z.output<typeof envelope>) {
         if (byName.has(subjectKey(parsed.data))) { row.reason = "Повтор предмета в базе или файле."; return }
         const tempId = -index - 1
         register(tempId, parsed.data)
-        inserts.push({ kind: group, item: parsed.data, tempId })
+        inserts.push({ rowNumber:index+1, kind: group, item: parsed.data, tempId })
         return
       }
       const { subject, ...fields } = obj
@@ -93,7 +93,7 @@ function buildPlan(db: DatabaseSync, data: z.output<typeof envelope>) {
         const key = taskKey(id, parsed.data.title, parsed.data.issuedOn)
         if (tasks.has(key)) { row.reason = "Повтор задания в базе или файле."; return }
         tasks.add(key)
-        inserts.push({ kind: group, item: { ...parsed.data, subjectId: id } })
+        inserts.push({ rowNumber:index+1, kind: group, item: { ...parsed.data, subjectId: id } })
       } else {
         const parsed = lessonSchema.safeParse(input)
         if (!parsed.success) { row.reason = explain(parsed.error); return }
@@ -102,7 +102,7 @@ function buildPlan(db: DatabaseSync, data: z.output<typeof envelope>) {
         const key = lessonKey(item)
         if (lessons.has(key)) { row.reason = "Повтор занятия в базе или файле."; return }
         lessons.add(key)
-        inserts.push({ kind: group, item })
+        inserts.push({ rowNumber:index+1, kind: group, item })
       }
     })
   }
@@ -129,14 +129,19 @@ export function processImport(db: DatabaseSync, source: string, confirmation?: s
     if (writing) {
       const ids = new Map<number, number>()
       const now = new Date().toISOString()
+      const digest = createHash("sha256").update(source).digest("hex")
+      const origin = db.prepare("INSERT INTO import_origins(digest,rowGroup,rowNumber,recordId,importedAt,sourceLabel) VALUES(?,?,?,?,?,?)")
       for (const op of inserts) {
+        let recordId: number
         if (op.kind === "subjects") {
-          ids.set(op.tempId, Number(insertSubject(db, op.item, now).lastInsertRowid))
+          recordId = Number(insertSubject(db, op.item, now).lastInsertRowid)
+          ids.set(op.tempId,recordId)
         } else {
           const subjectId = ids.get(op.item.subjectId) ?? op.item.subjectId
-          if (op.kind === "tasks") insertTask(db, { ...op.item, subjectId }, now)
-          else insertLesson(db, { ...op.item, subjectId })
+          const inserted = op.kind === "tasks" ? insertTask(db, { ...op.item, subjectId }, now) : insertLesson(db, { ...op.item, subjectId })
+          recordId = Number(inserted.lastInsertRowid)
         }
+        origin.run(digest,op.kind,op.rowNumber,recordId,now,doc.data.origin ?? "Ручной импорт JSON")
       }
     }
     db.exec("COMMIT")

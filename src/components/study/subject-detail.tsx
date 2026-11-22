@@ -21,7 +21,7 @@ export async function SubjectDetail({id}:{id:number}) {
     <Rows title="Оценки и зачёты" empty="Результаты ещё не внесены." items={results.map(r=><><span>{displayDate(String(r.day))} · {String(r.title)}</span><strong>{String(r.value)}</strong></>)}/>
     <Rows title="Занятия дисциплины" empty="Занятий пока нет." items={lessons.map(l=>{
       const date = String(l.movedDate ?? l.date)
-      return <Link href={"/schedule?week="+monday(date)+"#lesson-"+l.id+"-"+date} className="underline">{displayDate(date)} · {String(l.movedStart ?? l.startTime)} · {String(l.room)} · {String(l.status)}</Link>
+      return <Link key={Number(l.id)} href={"/schedule?week="+monday(date)+"#lesson-"+l.id+"-"+date} className="underline">{displayDate(date)} · {String(l.movedStart ?? l.startTime)} · {String(l.room)} · {String(l.status)}</Link>
     })}/>
     <Rows title="История дисциплины" empty="Изменений пока нет." items={history.map(h=><><span>{String(h.change)} · {String(h.title)}</span><small>{displayDate(String(h.at).slice(0,10))}</small></>)}/>
     {origin && <p className="text-xs text-muted-foreground">Источник · {String(origin.sourceLabel)} · строка {String(origin.rowNumber)} · {displayDate(String(origin.importedAt).slice(0,10))}</p>}

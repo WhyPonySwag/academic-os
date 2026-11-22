@@ -22,8 +22,8 @@ test("Пустое и заполненное пространство на пя�
       for (const width of [390,768,1280,1440,1920]) {
         await page.setViewportSize({width,height:width===390 ? 844 : 960})
         expect((await page.goto(path))?.ok()).toBeTruthy()
-        await expect(page.getByRole("heading",{name:heading,level:1,exact:true})).toBeVisible()
-        if (slug==="task-detail") await expect(page.getByRole("dialog")).toBeVisible()
+        if (slug==="task-detail") await expect(page.getByRole("dialog").getByRole("heading",{name:"Разрез учебного павильона"})).toBeVisible()
+        else await expect(page.getByRole("heading",{name:heading,level:1,exact:true})).toBeVisible()
         if (slug==="home") await expect(page.getByText(state==="empty" ? "На сегодня занятий нет." : "Просмотр макетов пройдёт в мастерской")).toBeVisible()
         await page.evaluate(async()=>{await document.fonts.ready})
         expect(await page.evaluate(()=>document.documentElement.scrollWidth),slug+" width "+width).toBeLessThanOrEqual(width)

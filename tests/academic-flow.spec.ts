@@ -59,7 +59,7 @@ test("От импортированной работы до подтверждё
   await expect(page.getByText("Зачтено",{exact:true})).toBeVisible()
   await page.getByRole("link",{name:task,exact:true}).click()
   await expect(dialog.getByText("Принято",{exact:true})).toBeVisible()
-  await dialog.getByRole("link",{name:"Прикрепить файл из архива"}).click()
+  await dialog.getByRole("link",{name:"Прикрепить файл"}).click()
   await dialog.getByLabel("Название материала").fill("Памятка "+suffix)
   const bytes=Buffer.from("Synthetic file "+suffix)
   await dialog.getByLabel(/Оригинал файла/).setInputFiles({name:"notes.txt",mimeType:"text/plain",buffer:bytes})

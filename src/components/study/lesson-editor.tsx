@@ -29,6 +29,7 @@ export function LessonEditor({ lesson, date, subjects, close, onSaved }: {
       <option value="" disabled>Выберите предмет</option>{subjects.map(s => <option key={s.id} value={s.id}>{s.title} · семестр {s.semester}</option>)}
     </select></Field>
     <Field label="Преподаватель"><Input name="teacher" required maxLength={200} defaultValue={lesson?.teacher} /></Field>
+    <Field label="Замещающий преподаватель"><Input name="substitute" maxLength={200} defaultValue={lesson?.substitute} /></Field>
     <SlotFields lesson={lesson} date={date} />
     <div className="grid grid-cols-2 gap-3">
       <Field label="Аудитория"><Input name="room" required maxLength={200} defaultValue={lesson?.room} /></Field>

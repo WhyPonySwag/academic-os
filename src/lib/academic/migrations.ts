@@ -71,6 +71,47 @@ export const migrations = [
     INSERT INTO task_history(taskId,at,change) SELECT NEW.id,NEW.updatedAt,'Срок: ' || coalesce(OLD.deadline,'Без срока') || ' → ' || coalesce(NEW.deadline,'Без срока') WHERE OLD.deadline IS NOT NEW.deadline;
     INSERT INTO task_history(taskId,at,change) SELECT NEW.id,NEW.updatedAt,CASE NEW.debt WHEN 1 THEN 'Задолженность подтверждена' ELSE 'Отметка задолженности снята' END WHERE OLD.debt <> NEW.debt;
   END;`,
+  `CREATE TABLE study_periods (
+    id INTEGER PRIMARY KEY, yearStart INTEGER NOT NULL CHECK(yearStart BETWEEN 1900 AND 9998),
+    course INTEGER NOT NULL CHECK(course > 0), semester INTEGER NOT NULL CHECK(semester > 0),
+    UNIQUE(yearStart,course,semester)
+  ) STRICT;
+  CREATE TABLE subject_periods (
+    subjectId INTEGER PRIMARY KEY REFERENCES subjects(id) ON DELETE CASCADE,
+    periodId INTEGER NOT NULL REFERENCES study_periods(id)
+  ) STRICT;
+  CREATE TABLE study_results (
+    id INTEGER PRIMARY KEY, subjectId INTEGER NOT NULL REFERENCES subjects(id) ON DELETE RESTRICT,
+    kind TEXT NOT NULL, title TEXT NOT NULL, value TEXT NOT NULL, day TEXT NOT NULL,
+    requestKey TEXT NOT NULL UNIQUE
+  ) STRICT;
+  CREATE INDEX results_subject ON study_results(subjectId,day);
+  CREATE TABLE study_events (
+    id INTEGER PRIMARY KEY, title TEXT NOT NULL, kind TEXT NOT NULL, day TEXT NOT NULL,
+    taskId INTEGER REFERENCES tasks(id) ON DELETE RESTRICT, outcome TEXT,
+    requestKey TEXT NOT NULL UNIQUE
+  ) STRICT;
+  CREATE INDEX events_day ON study_events(day);
+  CREATE TABLE study_notices (
+    id INTEGER PRIMARY KEY, title TEXT NOT NULL, requestKey TEXT NOT NULL UNIQUE
+  ) STRICT;
+  CREATE TABLE archive_blobs (
+    digest TEXT PRIMARY KEY, content BLOB NOT NULL
+  ) STRICT;
+  CREATE TABLE archive_materials (
+    id INTEGER PRIMARY KEY, title TEXT NOT NULL, filename TEXT NOT NULL, source TEXT NOT NULL,
+    sourceDate TEXT, subjectId INTEGER REFERENCES subjects(id) ON DELETE RESTRICT,
+    taskId INTEGER REFERENCES tasks(id) ON DELETE RESTRICT,
+    digest TEXT NOT NULL REFERENCES archive_blobs(digest), added TEXT NOT NULL
+  ) STRICT;
+  CREATE UNIQUE INDEX archive_identity ON archive_materials(digest,title,filename,source,
+    coalesce(sourceDate,''),coalesce(subjectId,0),coalesce(taskId,0));
+  ALTER TABLE lessons ADD COLUMN substitute TEXT NOT NULL DEFAULT '';
+  CREATE TABLE import_origins (
+    id INTEGER PRIMARY KEY, digest TEXT NOT NULL, rowGroup TEXT NOT NULL,
+    rowNumber INTEGER NOT NULL, recordId INTEGER NOT NULL, importedAt TEXT NOT NULL,
+    sourceLabel TEXT NOT NULL, UNIQUE(digest,rowGroup,rowNumber,recordId)
+  ) STRICT;`,
 ]
 
 export function migrate(db: DatabaseSync) {

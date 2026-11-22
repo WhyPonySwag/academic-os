@@ -33,6 +33,7 @@ export function Schedule({ week, today, lessons, subjects, groupParam, dayParam 
 }) {
   const router = useRouter()
   const [panel, setPanel] = useState<Panel | null>(null)
+  const [weekView,setWeekView] = useState(false)
   const close = () => setPanel(null)
   const stored = useSyncExternalStore(subscribe, readGroup, serverValue)
   const hash = useSyncExternalStore(subscribe, () => window.location.hash, serverValue)
@@ -76,7 +77,17 @@ export function Schedule({ week, today, lessons, subjects, groupParam, dayParam 
       </select></Field>
     </div>
     {!subjects.length && <p className="text-sm text-muted-foreground">Для первого занятия <Link className="text-primary underline" href="/subjects">добавьте предмет</Link> или загрузите данные из JSON.</p>}
-    <nav aria-label="Дни недели" className="grid grid-cols-7 gap-1 rounded-xl border bg-card p-1">
+    <nav aria-label="Вид расписания" className="flex items-center gap-1">
+      <Button variant={weekView ? "ghost" : "secondary"} size="sm" aria-pressed={!weekView} onClick={()=>setWeekView(false)}>День</Button>
+      <Button variant={weekView ? "secondary" : "ghost"} size="sm" aria-pressed={weekView} onClick={()=>setWeekView(true)}>Неделя</Button>
+      <Link className={buttonVariants({variant:"ghost",size:"sm"})} href={`/calendar?date=${day}&filter=lessons&group=${group}`}>Месяц</Link>
+    </nav>
+    {weekView && <section className="divide-y rounded-sm border bg-card">{dates.map((date,i)=><div key={date} className="grid gap-1 px-3 py-2 sm:grid-cols-[9rem_1fr]">
+      <strong className="text-sm">{weekdays[i]}<small className="block font-normal text-muted-foreground">{displayDate(date)}</small></strong>
+      <div>{slotsOn(date,lessons.filter(l=>!group || l.subgroup===group || l.subgroup==="Вся группа")).length===0 && <p className="text-xs text-muted-foreground">Нет занятий</p>}
+        {slotsOn(date,lessons.filter(l=>!group || l.subgroup===group || l.subgroup==="Вся группа")).map(({lesson,start})=><Link key={lesson.id} onClick={()=>setWeekView(false)} className="block py-1 text-sm hover:underline" href={url(week,date)+"#lesson-"+lesson.id+"-"+date}>{start} · {lesson.subject} · {lesson.room} · {lesson.subgroup} · {lesson.status}{lesson.substitute && " · замена: "+lesson.substitute}</Link>)}</div>
+    </div>)}</section>}
+    {!weekView && <><nav aria-label="Дни недели" className="grid grid-cols-7 gap-1 rounded-xl border bg-card p-1">
       {dates.map((date,i) => <Link key={date} href={url(week,date)} scroll={false} aria-current={day === date ? "date" : undefined}
         aria-label={weekdays[i] + " " + displayDate(date)} className={`rounded-md border border-transparent py-2 text-center text-xs hover:bg-muted ${day === date ? "border-primary/60! bg-secondary font-semibold text-foreground" : "text-muted-foreground"}`}>
         <span className="block">{["Пн","Вт","Ср","Чт","Пт","Сб","Вс"][i]}</span><span className="text-base font-semibold">{Number(date.slice(-2))}</span>
@@ -92,13 +103,13 @@ export function Schedule({ week, today, lessons, subjects, groupParam, dayParam 
           <span className="col-start-1 row-start-2 text-xs tabular-nums sm:col-auto sm:row-auto">{start}–{end}</span>
           <span className="col-start-2 row-start-1 font-medium wrap-anywhere sm:col-auto sm:row-auto"><span className={l.status === "Отменено" ? "text-muted-foreground line-through" : undefined}>{l.subject}</span> {l.subgroup !== "Вся группа" && <Badge variant="secondary">{l.subgroup}</Badge>}
             {l.status !== "Запланировано" && <span className={l.status === "Перенесено" ? "ml-1 text-xs text-warning" : "ml-1 text-xs text-muted-foreground"}>{l.status}</span>}</span>
-          <span className="text-xs wrap-anywhere text-muted-foreground">ауд. {l.room}</span>
+          <span className="text-xs wrap-anywhere text-muted-foreground">ауд. {l.room}{l.substitute && <small className="block">Замена · {l.substitute}</small>}</span>
         </button>)}
       </Card>
-    </section>
+    </section></>}
     {panel?.mode === "view" && <RecordPanel title={panel.lesson.subject} close={close}>
       <p>{displayDate(day)} · Пара {day === panel.lesson.movedDate ? panel.lesson.movedPair : panel.lesson.pair} · {day === panel.lesson.movedDate ? panel.lesson.movedStart + "–" + panel.lesson.movedEnd : panel.lesson.startTime + "–" + panel.lesson.endTime}</p>
-      <p className="wrap-anywhere">{panel.lesson.teacher} · {panel.lesson.lessonType} · ауд. {panel.lesson.room}</p>
+      <p className="wrap-anywhere">{panel.lesson.teacher}{panel.lesson.substitute && " → "+panel.lesson.substitute+" (замена)"} · {panel.lesson.lessonType} · ауд. {panel.lesson.room}</p>
       <p>{panel.lesson.subgroup === "Вся группа" ? "Вся группа" : "Подгруппа " + panel.lesson.subgroup} · {panel.lesson.status}</p>
       {panel.lesson.status === "Перенесено" && <p className="text-primary">{day === panel.lesson.movedDate
         ? `Перенесено с ${displayDate(panel.lesson.date)}, ${panel.lesson.startTime}–${panel.lesson.endTime}, пара ${panel.lesson.pair}`

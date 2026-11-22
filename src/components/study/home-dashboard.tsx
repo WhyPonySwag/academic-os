@@ -15,6 +15,8 @@ import {
   RefreshCw,
 } from "lucide-react"
 
+import { EntryForm } from "./entry-form"
+import { addNotice } from "@/app/register-actions"
 import { LocalClock } from "@/components/local-clock"
 import { Button } from "@/components/ui/button"
 import type {
@@ -145,7 +147,7 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
 
   return (
     <div className="w-full min-w-0 space-y-4">
-      <header className="dashboard-header flex flex-wrap items-center justify-between gap-4 rounded-xl border px-5 py-6 sm:px-7">
+      <header className="dashboard-header flex flex-wrap items-center justify-between gap-2 border-b px-1 pb-3">
         <div>
           <h1 className="page-title">
             Учебный обзор
@@ -173,7 +175,7 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
         </Button>
       </header>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-px overflow-hidden rounded-sm border bg-border lg:grid-cols-4">
         {stats.map(item => {
           const Icon = item.icon
 
@@ -181,16 +183,16 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
             <Link
               key={item.name}
               href={item.href}
-              className="min-w-0 rounded-xl border border-border bg-card p-4 transition-colors duration-150 hover:border-primary/50 hover:bg-secondary"
+              className="relative grid min-w-0 grid-cols-[1fr_auto] items-center gap-x-1 bg-card px-3 py-2 transition-colors duration-150 hover:border-primary/50 hover:bg-secondary"
             >
-              <div className="mb-4 flex items-center justify-between">
+              <div className="hidden">
                 <Icon size={18} className="text-primary" />
                 <ArrowUpRight size={14} className="text-muted-foreground" />
               </div>
-              <p className="text-3xl font-medium tracking-tight text-foreground tabular-nums">
+              <p className="col-start-2 row-start-1 text-xl font-medium tracking-tight text-foreground tabular-nums">
                 {item.value}
               </p>
-              <p className="mt-2 text-xs text-muted-foreground">
+              <p className="col-start-1 row-start-1 text-xs text-muted-foreground">
                 {item.name}
               </p>
             </Link>
@@ -224,7 +226,7 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
                 <Link
                   key={`${lesson.id}-${lesson.occurrence}`}
                   href={`/schedule?week=${data.today}#lesson-${lesson.id}-${data.today}`}
-                  className="flex gap-3 rounded-lg border border-border bg-secondary/50 p-3 hover:bg-accent"
+                  className="flex gap-3 border-l-2 border-border px-3 py-1.5 hover:bg-accent"
                 >
                   <div className="w-20 shrink-0 text-xs font-semibold text-primary">
                     {lesson.start}
@@ -296,7 +298,7 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
               {data.events.map((event, index) => (
                 <Link
                   key={`${event.id}-${index}`}
-                  href="/calendar"
+                  href={`/calendar?date=${event.date}`}
                   className="flex items-center justify-between gap-3 text-sm hover:text-primary"
                 >
                   <span className="min-w-0 text-foreground">
@@ -338,7 +340,7 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
           </p>
         </Panel>
 
-        <Panel title="Академические задолженности" href="/tasks?debt=1">
+        <Panel title="Академические задолженности" href="/debts">
           {!data.debts.supported ? (
             <Empty>
               Учёт подтверждённых задолженностей пока не подключён
@@ -351,7 +353,7 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
           )}
         </Panel>
 
-        <Panel title="Важные объявления" href="/calendar">
+        <Panel title="Важные объявления" href="#notices"><div id="notices" className="mb-2"><EntryForm title="Добавить объявление" action={addNotice} fields={[{name:"title",label:"Текст объявления"}]}/></div>
           {!data.announcements.supported ? (
             <Empty>
               Источник учебных объявлений ещё не подключён.

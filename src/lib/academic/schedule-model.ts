@@ -3,7 +3,7 @@ import type { RecordKey } from "./model"
 export const subgroups = ["Вся группа", "I", "II"] as const
 export const lessonStatuses = ["Запланировано", "Отменено", "Перенесено"] as const
 export type LessonFields = {
-  subjectId: number; teacher: string; date: string; pair: number; startTime: string; endTime: string
+  substitute?: string; subjectId: number; teacher: string; date: string; pair: number; startTime: string; endTime: string
   room: string; subgroup: typeof subgroups[number]; lessonType: string; status: typeof lessonStatuses[number]
   movedDate: string | null; movedPair: number | null; movedStart: string | null; movedEnd: string | null; notes: string
 }

@@ -15,11 +15,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="ru" className="dark h-full antialiased">
       <body className="min-h-full">
         <a className="skip-link" href="#page-content">К содержанию</a>
-        <SidebarProvider style={{ "--sidebar-width": "15rem" } as React.CSSProperties}>
+        <SidebarProvider style={{ "--sidebar-width": "13rem" } as React.CSSProperties}>
           <AppSidebar />
           <SidebarInset className="min-w-0">
             <SiteHeader />
-            <div id="page-content" tabIndex={-1} className="mx-auto w-full max-w-[1480px] px-4 py-7 outline-none sm:px-8 lg:px-10 lg:py-9">
+            <div id="page-content" tabIndex={-1} className="mx-auto w-full max-w-[1480px] px-3 py-4 outline-none sm:px-5 lg:px-7 lg:py-5">
               {children}
             </div>
           </SidebarInset>

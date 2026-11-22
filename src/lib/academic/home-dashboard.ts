@@ -140,7 +140,7 @@ export async function readDashboard(): Promise<DashboardData> {
   const read = (name: string): Row[] => {
     if (!available.has(name)) return []
     // Вызывается только с фиксированными именами таблиц.
-    return db.prepare(`SELECT * FROM "${name}" LIMIT 10000`).all() as Row[]
+    return db.prepare(`SELECT * FROM "${name}"`).all() as Row[]
   }
 
   const columns = (name: string): Set<string> => {
@@ -247,7 +247,7 @@ export async function readDashboard(): Promise<DashboardData> {
     const common = {
       id,
       title: subject,
-      teacher: str(row.teacher),
+      teacher: row.substitute ? String(row.substitute)+" (замена)" : str(row.teacher),
       room: str(row.room),
       subgroup: str(row.subgroup, "Вся группа"),
       status,
@@ -322,7 +322,8 @@ export async function readDashboard(): Promise<DashboardData> {
     }
   }
 
-  const events: DashboardEvent[] = []
+  const events: DashboardEvent[] = db.prepare("SELECT id,title,kind AS type,day AS date FROM study_events WHERE day>=? ORDER BY day,id LIMIT 6").all(today)
+    .map(row=>({id:Number(row.id),title:String(row.title),type:String(row.type),date:String(row.date)}))
 
   const eventTable = [
     "academic_events",
@@ -373,7 +374,7 @@ export async function readDashboard(): Promise<DashboardData> {
   events.sort((a, b) => a.date.localeCompare(b.date))
 
   const announcementsSupported = available.has("announcements")
-  const announcementTitles: string[] = []
+  const announcementTitles = db.prepare("SELECT title FROM study_notices ORDER BY id DESC LIMIT 5").all().map(row=>String(row.title))
 
   if (announcementsSupported) {
     for (const row of read("announcements")) {
@@ -402,7 +403,7 @@ export async function readDashboard(): Promise<DashboardData> {
       tasks: debtTasks,
     },
     announcements: {
-      supported: announcementsSupported,
+      supported: true,
       titles: announcementTitles.slice(0, 5),
     },
     events: events.slice(0, 6),

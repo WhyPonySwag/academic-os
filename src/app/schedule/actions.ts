@@ -18,7 +18,7 @@ export async function saveLesson(key: RecordKey | null, form: FormData): Promise
   try {
     if (key) {
       const change = db.prepare(`UPDATE lessons SET subjectId=?,teacher=?,date=?,pair=?,startTime=?,endTime=?,room=?,subgroup=?,
-        lessonType=?,status=?,movedDate=?,movedPair=?,movedStart=?,movedEnd=?,notes=?,revision=revision+1
+        lessonType=?,status=?,movedDate=?,movedPair=?,movedStart=?,movedEnd=?,notes=?,substitute=?,revision=revision+1
         WHERE id=? AND revision=?`).run(...lessonValues(result.data),key.id,key.revision)
       if (!change.changes) return stale
     } else insertLesson(db, result.data)

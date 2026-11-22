@@ -60,28 +60,28 @@
 :root,
 .dark {
   color-scheme: dark;
-  --background: #0d0f12;
-  --foreground: #eceef0;
-  --card: #15181c;
+  --background: #0E0E0E;
+  --foreground: #E6EDF3;
+  --card: #101010;
   --card-foreground: var(--foreground);
-  --popover: #1d2126;
+  --popover: #191919;
   --popover-foreground: var(--foreground);
-  --primary: #AAB4C0;
+  --primary: #b9cddd;
   --primary-foreground: var(--background);
   --secondary: var(--popover);
   --secondary-foreground: var(--foreground);
   --muted: var(--secondary);
   --muted-foreground: #a2a8b0;
-  --accent: #252a30;
+  --accent: #202020;
   --accent-foreground: var(--foreground);
   --destructive: #e4989b;
   --success: #95b5a4;
-  --warning: #d6b58b;
-  --border: #30353b;
-  --input: #68737e;
-  --ring: var(--primary);
-  --radius: 0.5rem;
-  --sidebar: #111316;
+  --warning: #e8a39a;
+  --border: #2E2F30;
+  --input: #505356;
+  --ring: #75baff;
+  --radius: 0.25rem;
+  --sidebar: #101010;
   --sidebar-foreground: #b9bfc6;
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--primary-foreground);
@@ -97,7 +97,7 @@
 }
 
 .page-title {
-  @apply text-[1.875rem] leading-tight font-semibold tracking-[-0.035em] sm:text-[2.125rem];
+  @apply text-[1.45rem] leading-tight font-semibold tracking-[-0.035em] sm:text-[1.7rem];
 }
 
 .dashboard-header {
@@ -105,21 +105,6 @@
   isolation: isolate;
   overflow: hidden;
   background: var(--card);
-}
-
-/* Render the existing architectural drawing as a silver line study. */
-.dashboard-header::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: 0 5rem 0 44%;
-  background: url("/pavilion.webp") center / contain no-repeat;
-  filter: grayscale(1);
-  opacity: .56;
-  pointer-events: none;
-}
-@media (max-width: 900px) {
-  .dashboard-header::before { display: none; }
 }
 
 .skip-link {

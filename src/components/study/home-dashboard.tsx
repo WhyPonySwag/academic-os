@@ -4,13 +4,9 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import {
-  AlertCircle,
   ArrowUpRight,
   BookOpen,
-  CalendarDays,
   CheckCircle2,
-  GraduationCap,
-  ListTodo,
   Megaphone,
   RefreshCw,
 } from "lucide-react"
@@ -121,27 +117,23 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
           lesson.occurrence === "original")
       ).length,
       href: "/schedule",
-      icon: CalendarDays,
     },
     {
       name: "Незавершённые работы",
       value: data.tasks.open,
       href: "/tasks?view=unfinished",
-      icon: ListTodo,
     },
     {
       name: "Просроченные работы",
       value: data.tasks.overdue.length,
       href: "/tasks",
-      icon: AlertCircle,
     },
     {
       name: "Академические долги",
       value: data.debts.supported
-        ? data.debts.tasks.length
+        ? data.debts.tasks.length + data.debts.subjects.length
         : "—",
-      href: "/tasks?debt=1",
-      icon: GraduationCap,
+      href: "/debts",
     },
   ]
 
@@ -177,18 +169,12 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
 
       <div className="grid grid-cols-2 gap-px overflow-hidden rounded-sm border bg-border lg:grid-cols-4">
         {stats.map(item => {
-          const Icon = item.icon
-
           return (
             <Link
               key={item.name}
               href={item.href}
               className="relative grid min-w-0 grid-cols-[1fr_auto] items-center gap-x-1 bg-card px-3 py-2 transition-colors duration-150 hover:border-primary/50 hover:bg-secondary"
             >
-              <div className="hidden">
-                <Icon size={18} className="text-primary" />
-                <ArrowUpRight size={14} className="text-muted-foreground" />
-              </div>
               <p className="col-start-2 row-start-1 text-xl font-medium tracking-tight text-foreground tabular-nums">
                 {item.value}
               </p>
@@ -346,10 +332,10 @@ export function HomeDashboard({ data }: { data: DashboardData }) {
               Учёт подтверждённых задолженностей пока не подключён
               к этой версии базы данных.
             </Empty>
-          ) : data.debts.tasks.length === 0 ? (
+          ) : data.debts.tasks.length + data.debts.subjects.length === 0 ? (
             <Empty>Подтверждённых незакрытых задолженностей нет.</Empty>
           ) : (
-            <TaskList tasks={data.debts.tasks.slice(0, 5)} />
+            <>{data.debts.tasks.length > 0 && <TaskList tasks={data.debts.tasks.slice(0, 5)} />}{data.debts.subjects.slice(0,5).map(d=><Link href="/debts" className="block py-1 text-sm underline" key={d.id}>{d.title}</Link>)}</>
           )}
         </Panel>
 

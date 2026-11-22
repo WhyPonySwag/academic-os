@@ -3,7 +3,7 @@ import Link from "next/link"
 import { localDatabase } from "@/lib/academic/database"
 import { displayDate } from "@/lib/academic/model"
 import { resultKinds } from "@/lib/academic/register"
-import { addResult, assignPeriod, finishRetake, scheduleRetake } from "@/app/register-actions"
+import { addSubjectDebt, addResult, assignPeriod, finishRetake, scheduleRetake } from "@/app/register-actions"
 import { EntryForm } from "./entry-form"
 
 export function Ledger({ title, children, action }: { title: string; children: ReactNode; action?: ReactNode }) {
@@ -34,11 +34,18 @@ export async function Results() {
 export async function Debts() {
   const db = await localDatabase()
   const tasks = db.prepare("SELECT t.*,s.title subject FROM tasks t JOIN subjects s ON s.id=t.subjectId WHERE debt=1 AND status<>'Принято' ORDER BY deadline IS NULL,deadline,t.id").all()
-  const retakes = db.prepare("SELECT e.*,t.title task FROM study_events e JOIN tasks t ON t.id=e.taskId ORDER BY e.day DESC,e.id DESC").all()
-  return <Ledger title="Долги и пересдачи" action={<Link className="text-sm underline" href="/tasks?debt=1">К заданиям</Link>}>
-    <Rows title="Открытые задолженности" empty="Подтверждённых открытых долгов нет." items={tasks.map(t=><>
+  const subjects = db.prepare("SELECT id,title,semester FROM subjects ORDER BY title").all()
+  const debts = db.prepare("SELECT d.*,s.title subject FROM subject_debts d JOIN subjects s ON s.id=d.subjectId WHERE closedAt IS NULL ORDER BY d.id").all()
+  const retakes = db.prepare("SELECT e.*,coalesce(t.title,d.title) task FROM study_events e LEFT JOIN tasks t ON t.id=e.taskId LEFT JOIN subject_debts d ON d.id=e.debtId WHERE e.kind='Пересдача' ORDER BY e.day DESC,e.id DESC").all()
+  return <Ledger title="Долги и пересдачи" action={subjects.length>0 && <EntryForm title="Добавить долг по дисциплине" action={addSubjectDebt} fields={[
+    {name:"subjectId",label:"Дисциплина",options:subjects.map(s=>({value:Number(s.id),label:s.title+" · семестр "+s.semester}))},
+    {name:"title",label:"Основание задолженности"},{name:"source",label:"Источник подтверждения"}]}/>}
+    >
+    <Rows title="Открытые задолженности" empty="Подтверждённых открытых долгов нет." items={[...tasks.map(t=><>
       <div><Link className="font-medium hover:underline" href={"/tasks?task="+t.id}>{String(t.title)}</Link><p className="text-xs text-muted-foreground">{String(t.subject)} · {String(t.status)}</p></div>
-      <EntryForm title="Назначить пересдачу" hidden={{taskId:String(t.id)}} fields={[{name:"day",label:"Дата пересдачи",type:"date"}]} action={scheduleRetake}/></>)}/>
+      <EntryForm title="Назначить пересдачу" hidden={{taskId:String(t.id)}} fields={[{name:"day",label:"Дата пересдачи",type:"date"}]} action={scheduleRetake}/></>), ...debts.map(d=><>
+      <div><strong>{String(d.title)}</strong><p className="text-xs text-muted-foreground">{String(d.subject)} · {String(d.source)}</p></div>
+      <EntryForm title="Назначить пересдачу" hidden={{debtId:String(d.id)}} fields={[{name:"day",label:"Дата пересдачи",type:"date"}]} action={scheduleRetake}/></>)]}/>
     <Rows title="Попытки пересдачи" empty="Пересдачи пока не назначены." items={retakes.map(e=><>
       <Link href={"/calendar?date="+e.day}>{displayDate(String(e.day))} · {String(e.task)}</Link>
       {e.outcome ? <strong>{String(e.outcome)}</strong> : <EntryForm title="Внести итог" action={finishRetake} hidden={{eventId:String(e.id)}} fields={[

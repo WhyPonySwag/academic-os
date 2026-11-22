@@ -112,6 +112,12 @@ export const migrations = [
     rowNumber INTEGER NOT NULL, recordId INTEGER NOT NULL, importedAt TEXT NOT NULL,
     sourceLabel TEXT NOT NULL, UNIQUE(digest,rowGroup,rowNumber,recordId)
   ) STRICT;`,
+  `CREATE TABLE subject_debts (
+    id INTEGER PRIMARY KEY, subjectId INTEGER NOT NULL REFERENCES subjects(id) ON DELETE RESTRICT,
+    title TEXT NOT NULL, source TEXT NOT NULL, closedAt TEXT, requestKey TEXT NOT NULL UNIQUE
+  ) STRICT;
+  ALTER TABLE study_events ADD COLUMN debtId INTEGER REFERENCES subject_debts(id) ON DELETE RESTRICT;
+  CREATE INDEX retakes_debt ON study_events(debtId) WHERE debtId IS NOT NULL;`,
 ]
 
 export function migrate(db: DatabaseSync) {

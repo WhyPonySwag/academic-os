@@ -52,6 +52,7 @@ export type DashboardData = {
   }[]
   debts: {
     supported: boolean
+    subjects: {id:number;title:string}[]
     tasks: DashboardTask[]
   }
   announcements: {
@@ -401,6 +402,7 @@ export async function readDashboard(): Promise<DashboardData> {
     debts: {
       supported: Boolean(debtFlag || debtTable),
       tasks: debtTasks,
+      subjects:db.prepare("SELECT id,title FROM subject_debts WHERE closedAt IS NULL ORDER BY id").all().map(d=>({id:Number(d.id),title:String(d.title)})),
     },
     announcements: {
       supported: true,

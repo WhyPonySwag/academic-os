@@ -9,7 +9,7 @@ export type SubjectSummary = Subject & { total:number; unfinished:number; debts:
 export async function listSubjects() {
   const db = await localDatabase()
   return db.prepare(`SELECT s.*,count(t.id) total,count(CASE WHEN t.status <> 'Принято' THEN 1 END) unfinished,
-    count(CASE WHEN t.debt=1 THEN 1 END) debts,min(CASE WHEN t.status <> 'Принято' AND t.deadline>=date('now','localtime') THEN t.deadline END) nearest
+    count(CASE WHEN t.debt=1 AND t.status <> 'Принято' THEN 1 END) debts,min(CASE WHEN t.status <> 'Принято' AND t.deadline>=date('now','localtime') THEN t.deadline END) nearest
     FROM subjects s LEFT JOIN tasks t ON t.subjectId=s.id GROUP BY s.id ORDER BY semester,s.id`).all().map(row => ({ ...row }) as SubjectSummary)
 }
 

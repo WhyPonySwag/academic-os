@@ -25,6 +25,7 @@ export function Tasks({ subjects, tasks, initialSubject, initialTask, initialDeb
 }) {
   const [subjectFilter, setSubjectFilter] = useState(initialSubject)
   const [statusFilter, setStatusFilter] = useState("")
+  const [filtersOpen,setFiltersOpen] = useState(false)
   const [search,setSearch] = useState("")
   const [debt,setDebt] = useState(initialDebt)
   const [sort, setSort] = useState("deadline")
@@ -51,7 +52,8 @@ export function Tasks({ subjects, tasks, initialSubject, initialTask, initialDeb
         <h1 className="page-title">Задания</h1>
         {subjects.length > 0 && <Button onClick={() => setPanel({ mode: "edit" })}><Plus aria-hidden />Добавить задание</Button>}
       </div>
-      <div className="grid gap-3 rounded-xl border bg-card p-3 sm:grid-cols-2 xl:grid-cols-3">
+      <Button variant="outline" size="sm" className="sm:hidden" aria-expanded={filtersOpen} onClick={()=>setFiltersOpen(!filtersOpen)}>Фильтры и сортировка</Button>
+      <div className={`${filtersOpen ? "grid" : "hidden"} gap-2 rounded-sm border bg-card p-2 sm:grid sm:grid-cols-2 xl:grid-cols-3`}>
         <Field label="Список работ"><select className={selectStyle} value={view} onChange={e=>setView(e.target.value)}><option value="">Все работы</option><option value="unfinished">Незавершённые</option><option value="attention">Требуют внимания</option></select></Field>
         <Field label="Поиск заданий"><Input type="search" value={search} onChange={e=>setSearch(e.target.value)}/></Field>
         <Field label="Задолженность"><select className={selectStyle} value={debt} onChange={e=>setDebt(e.target.value)}><option value="">Все работы</option><option value="debt">Подтверждённые долги</option><option value="ordinary">Без задолженности</option></select></Field>

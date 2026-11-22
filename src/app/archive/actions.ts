@@ -5,7 +5,10 @@ import { revalidatePath } from "next/cache"
 import { z } from "zod"
 import { localDatabase } from "@/lib/academic/database"
 
-export async function reviewMaterial(form: FormData, confirmation?: string) {
+type Review = { error?:string; saved?:boolean; token?:string; details?:{
+  title:string; filename:string; source:string; sourceDate:string; subject:string; task:string; size:number; digest:string
+} }
+export async function reviewMaterial(form: FormData, confirmation?: string): Promise<Review> {
   const db = await localDatabase()
   const file = form.get("file")
   if (!(file instanceof File) || !file.size || file.size > 8 * 1024 * 1024)
@@ -15,7 +18,7 @@ export async function reviewMaterial(form: FormData, confirmation?: string) {
     subjectId:optionalId,taskId:optionalId,sourceDate:z.union([z.literal(""),z.iso.date()]) }).safeParse(Object.fromEntries(form))
   if (!checked.success) return {error:"Проверьте название, источник и выбранные связи."}
   const {title,source,sourceDate,subjectId,taskId} = checked.data
-  const filename = file.name.split(/[\\/]/).pop()?.replace(/[\u0000-\u001f\u007f]/g,"").trim().slice(0,240)
+  const filename = file.name.split(/[\\/]/).pop()?.split("").filter(ch=>ch.charCodeAt(0)>=32 && ch.charCodeAt(0)!==127).join("").trim().slice(0,240)
   if (!filename) return {error:"У файла отсутствует имя."}
   const bytes = Buffer.from(await file.arrayBuffer())
   const digest = createHash("sha256").update(bytes).digest("hex")

@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Field, RecordPanel, selectStyle } from "./record-panel"
 import type { Choice } from "@/lib/academic/register"
 
-export function MaterialImport({subjects,tasks}: {subjects:Choice[];tasks:(Choice & {subjectId:number})[]}) {
-  const [open,setOpen] = useState(false)
+export function MaterialImport({subjects,tasks,initialTask}: {initialTask?:number;subjects:Choice[];tasks:(Choice & {subjectId:number})[]}) {
+  const [open,setOpen] = useState(!!initialTask)
   const [busy,setBusy] = useState(false)
   const [subject,setSubject] = useState("")
   const [review,setReview] = useState<Awaited<ReturnType<typeof reviewMaterial>>>({})
@@ -32,7 +32,7 @@ export function MaterialImport({subjects,tasks}: {subjects:Choice[];tasks:(Choic
           <Field label="Источник материала"><Input name="source" maxLength={500} required placeholder="Например, название методички или сообщение преподавателя"/></Field>
           <Field label="Дата источника, если известна"><Input type="date" name="sourceDate"/></Field>
           <Field label="Дисциплина"><select name="subjectId" className={selectStyle} value={subject} onChange={e=>setSubject(e.target.value)}><option value="">Без привязки</option>{subjects.map(s=><option key={s.id} value={s.id}>{s.title}</option>)}</select></Field>
-          <Field label="Задание"><select name="taskId" className={selectStyle} key={subject}><option value="">Без привязки</option>{tasks.filter(t=>!subject || String(t.subjectId)===subject).map(t=><option key={t.id} value={t.id}>{t.title}</option>)}</select></Field>
+          <Field label="Задание"><select name="taskId" defaultValue={initialTask ?? ""} className={selectStyle} key={subject}><option value="">Без привязки</option>{tasks.filter(t=>!subject || String(t.subjectId)===subject).map(t=><option key={t.id} value={t.id}>{t.title}</option>)}</select></Field>
         </fieldset>
         {review.error && <p role="alert" className="text-sm text-destructive">{review.error}</p>}
         {review.details && <div role="status" className="grid gap-1 border-l-2 pl-3 text-sm wrap-anywhere">

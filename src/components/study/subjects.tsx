@@ -44,6 +44,7 @@ export function Subjects({ subjects, scoped }: { subjects: SubjectSummary[]; sco
               </dl>
               {subject.notes && <p className="line-clamp-3 text-sm whitespace-pre-wrap wrap-anywhere text-muted-foreground">{subject.notes}</p>}
               <div className="mt-auto flex flex-wrap items-center gap-2 border-t pt-3">
+                {!scoped && <Link href={`/subjects?subject=${subject.id}`} className={buttonVariants({variant:"secondary",size:"sm"})}>Карточка дисциплины</Link>}
                 <Link href={`/tasks?subject=${subject.id}`} className={buttonVariants({ variant: "outline", size: "sm" })}>Задания предмета<ArrowRight aria-hidden /></Link>
                 <Button size="sm" variant="ghost" onClick={() => setPanel({ mode: "edit", subject })}>Изменить</Button>
                 <Button size="sm" variant="ghost" onClick={() => setPanel({ mode: "delete", subject })}>Удалить</Button>

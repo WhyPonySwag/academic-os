@@ -32,7 +32,7 @@ async function Month({ searchParams }: PageProps<"/calendar">) {
     <header className="flex flex-wrap items-center justify-between gap-2 border-b pb-3"><h1 className="page-title">Календарь</h1>
       <EntryForm title="Добавить событие" action={addEvent} fields={[{name:"title",label:"Название события"},
         {name:"kind",label:"Вид события",options:eventKinds.map(label=>({value:label,label}))},{name:"day",label:"Дата события",type:"date",initial:selected}]}/></header>
-    {group && <p className="text-sm">Подгруппа {group} · <Link className="underline" href={`/calendar?date=${selected}&filter=${filter}`}>Показать все</Link></p>
+    {group && <p className="text-sm">Подгруппа {group} · <Link className="underline" href={`/calendar?date=${selected}&filter=${filter}`}>Показать все</Link></p>}
     <nav aria-label="Фильтр событий" className="flex flex-wrap gap-1">{Object.entries(filters).map(([key,label]) =>
       <Link key={key} aria-current={key === filter ? "true" : undefined} href={url(selected,key)} scroll={false}
         className={buttonVariants({ variant:key === filter ? "secondary" : "ghost", size:"sm" })}>{label}</Link>)}</nav>

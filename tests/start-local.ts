@@ -9,6 +9,9 @@ export default async function startLocal(config: FullConfig) {
   const { port } = new URL(config.projects[0].use.baseURL!)
   const directory = await mkdtemp(join(tmpdir(), "academic-os-e2e-"))
   const database = join(directory, "academic.db")
+  // Only this freshly created filename may be used by visual fixtures.
+  if (config.configFile.endsWith("visual/playwright.config.ts") || config.configFile.endsWith("visual\\playwright.config.ts"))
+    process.env.ACADEMIC_VISUAL_DB = database
   const server = spawn(process.execPath, [
     require.resolve("next/dist/bin/next"), "start", "--hostname", "127.0.0.1", "--port", port,
   ], {

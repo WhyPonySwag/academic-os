@@ -9,6 +9,7 @@ on:
       - "visual/**"
       - "package.json"
       - "package-lock.json"
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -32,7 +33,7 @@ jobs:
       - name: Build application for clean, isolated data
         run: npm run build
       - run: npm exec -- playwright install --with-deps chromium
-      - name: Capture the seven app sections at desktop and mobile widths
+      - name: Capture empty and populated sections at five viewport widths
         env:
           ACADEMIC_E2E_SKIP_BUILD: "1"
         run: npm exec -- playwright test --config visual/playwright.config.ts
